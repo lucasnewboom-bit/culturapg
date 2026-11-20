@@ -1,0 +1,19 @@
+# Configuração local do MySQL (nunca publicar credenciais)
+/config/database.local.php
+/.env
+/.env.*
+
+# Arquivos pessoais enviados por usuários
+/public/img/perfis/*
+!/public/img/perfis/.gitkeep
+
+# Ferramentas e arquivos locais
+/.idea/
+/.vscode/
+/vendor/
+/node_modules/
+/public/teste.php
+/public/teste_conexao.php
+*.log
+Thumbs.db
+Desktop.ini

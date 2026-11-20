@@ -1,0 +1,173 @@
+<?php
+function hFormularioEvento($valor): string {
+    return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
+}
+$emEdicao = is_array($evento);
+$dadosEvento = $evento ?? [];
+if ($dadosFormulario) {
+    $dadosEvento = array_merge($dadosEvento, $dadosFormulario);
+    if (isset($dadosFormulario['sessoes']) && is_array($dadosFormulario['sessoes'])) {
+        $dadosEvento['sessoes'] = $dadosFormulario['sessoes'];
+    }
+    if (isset($dadosFormulario['links']) && is_array($dadosFormulario['links'])) {
+        $dadosEvento['links_completos'] = [];
+        foreach ($dadosFormulario['links'] as $tipo => $url) $dadosEvento['links_completos'][] = ['tipo_link' => $tipo, 'url' => $url];
+    }
+}
+$sessoesForm = $dadosEvento['sessoes'] ?? [['data_evento' => '', 'horario_inicio' => '', 'horario_fim' => '']];
+$linksForm = ['whatsapp' => '', 'instagram' => '', 'sympla' => ''];
+foreach (($dadosEvento['links_completos'] ?? []) as $linkForm) $linksForm[$linkForm['tipo_link']] = $linkForm['url'] ?? '';
+$acaoFormulario = $emEdicao ? 'atualizar' : 'cadastrar';
+$urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEdicao ? '&id=' . (int) $evento['id_evento'] : '');
+?>
+
+<section class="formulario-evento secao-categorias">
+    <div class="cabecalho-gerenciamento-eventos">
+        <div>
+            <h1><?= $emEdicao ? 'Editar evento' : 'Cadastrar evento' ?></h1>
+            <p>Os campos de localidade são vinculados a Ponta Grossa - PR.</p>
+        </div>
+        <a class="link-voltar-eventos" href="index.php?pagina=organizador">Voltar aos meus eventos</a>
+    </div>
+
+    <?php if ($erro !== ''): ?><div class="mensagem-autenticacao" role="alert"><?= hFormularioEvento($erro) ?></div><?php endif; ?>
+    <?php if ($mensagem !== ''): ?><div class="mensagem-autenticacao" role="status"><?= hFormularioEvento($mensagem) ?></div><?php endif; ?>
+
+    <form method="post" action="<?= hFormularioEvento($urlFormulario) ?>" class="form-evento" novalidate>
+        <input type="hidden" name="csrf_token" value="<?= hFormularioEvento($csrfEventos) ?>">
+
+        <h2>Informações do evento</h2>
+        <div class="grade-formulario-evento">
+            <div class="campo-evento campo-evento-largo">
+                <label for="titulo">Título *</label>
+                <input id="titulo" name="titulo" maxlength="150" required value="<?= hFormularioEvento($dadosEvento['titulo'] ?? '') ?>">
+            </div>
+            <div class="campo-evento">
+                <label for="categoria_id">Categoria *</label>
+                <select id="categoria_id" name="categoria_id" required>
+                    <option value="">Selecione</option>
+                    <?php foreach ($categorias as $categoria): ?>
+                        <option value="<?= (int) $categoria['id_categoria'] ?>" <?= (string) ($dadosEvento['categoria_id'] ?? '') === (string) $categoria['id_categoria'] ? 'selected' : '' ?>><?= hFormularioEvento($categoria['nome']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="campo-evento">
+                <label for="classificacao_indicativa">Classificação indicativa</label>
+                <select id="classificacao_indicativa" name="classificacao_indicativa">
+                    <option value="">Não informada</option>
+                    <?php foreach (['Livre', '10', '12', '14', '16', '18'] as $classificacao): ?>
+                        <option value="<?= $classificacao ?>" <?= (string) ($dadosEvento['classificacao_indicativa'] ?? '') === $classificacao ? 'selected' : '' ?>><?= $classificacao === 'Livre' ? 'Livre' : $classificacao . ' anos' ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="campo-evento campo-evento-largo">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" rows="4"><?= hFormularioEvento($dadosEvento['descricao'] ?? '') ?></textarea>
+            </div>
+            <div class="campo-evento campo-evento-check">
+                <label><input type="checkbox" name="gratuito" value="1" <?= !empty($dadosEvento['gratuito']) ? 'checked' : '' ?>> Evento gratuito</label>
+            </div>
+            <div class="campo-evento">
+                <label for="valor">Valor (R$)</label>
+                <input id="valor" name="valor" type="number" min="0" step="0.01" value="<?= hFormularioEvento($dadosEvento['valor'] ?? '0.00') ?>">
+            </div>
+        </div>
+
+        <h2>Local</h2>
+        <div class="grade-formulario-evento">
+            <div class="campo-evento">
+                <label for="local_nome">Nome do local *</label>
+                <input id="local_nome" name="local_nome" maxlength="100" required value="<?= hFormularioEvento($dadosEvento['local_nome'] ?? '') ?>">
+            </div>
+            <div class="campo-evento campo-evento-largo">
+                <label for="endereco">Endereço em Ponta Grossa - PR *</label>
+                <input id="endereco" name="endereco" maxlength="255" required value="<?= hFormularioEvento($dadosEvento['endereco'] ?? '') ?>">
+            </div>
+            <div class="campo-evento">
+                <label for="latitude">Latitude (opcional)</label>
+                <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" value="<?= hFormularioEvento($dadosEvento['latitude'] ?? '') ?>">
+            </div>
+            <div class="campo-evento">
+                <label for="longitude">Longitude (opcional)</label>
+                <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" value="<?= hFormularioEvento($dadosEvento['longitude'] ?? '') ?>">
+            </div>
+        </div>
+
+        <h2>Contato</h2>
+        <div class="grade-formulario-evento">
+            <div class="campo-evento">
+                <label for="tipo_contato">Tipo de contato</label>
+                <select id="tipo_contato" name="tipo_contato">
+                    <option value="">Não informado</option>
+                    <?php foreach (['whatsapp' => 'WhatsApp', 'email' => 'E-mail', 'telefone' => 'Telefone', 'site' => 'Site', 'outro' => 'Outro'] as $tipo => $rotulo): ?>
+                        <option value="<?= $tipo ?>" <?= ($dadosEvento['tipo_contato'] ?? '') === $tipo ? 'selected' : '' ?>><?= $rotulo ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="campo-evento campo-evento-largo">
+                <label for="link_contato">Link ou informação de contato</label>
+                <input id="link_contato" name="link_contato" maxlength="500" value="<?= hFormularioEvento($dadosEvento['link_contato'] ?? '') ?>" placeholder="https://...">
+            </div>
+        </div>
+
+        <h2>Datas e horários</h2>
+        <div id="sessoes-evento">
+            <?php foreach ($sessoesForm as $indice => $sessao): ?>
+                <div class="linha-sessao-evento">
+                    <div class="campo-evento"><label>Data *</label><input type="date" name="sessoes[<?= (int) $indice ?>][data_evento]" value="<?= hFormularioEvento($sessao['data_evento'] ?? '') ?>"></div>
+                    <div class="campo-evento"><label>Início *</label><input type="time" name="sessoes[<?= (int) $indice ?>][horario_inicio]" value="<?= hFormularioEvento(substr((string) ($sessao['horario_inicio'] ?? ''), 0, 5)) ?>"></div>
+                    <div class="campo-evento"><label>Término</label><input type="time" name="sessoes[<?= (int) $indice ?>][horario_fim]" value="<?= hFormularioEvento(substr((string) ($sessao['horario_fim'] ?? ''), 0, 5)) ?>"></div>
+                    <button type="button" class="botao-remover-sessao" aria-label="Remover data">Remover</button>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <button type="button" id="adicionar-sessao-evento" class="botao-secundario-evento">Adicionar outra data</button>
+
+        <h2>Links de divulgação</h2>
+        <div class="grade-formulario-evento">
+            <?php foreach (['whatsapp' => 'WhatsApp', 'instagram' => 'Instagram', 'sympla' => 'Sympla'] as $tipo => $rotulo): ?>
+                <div class="campo-evento"><label for="link_<?= $tipo ?>"><?= $rotulo ?></label><input id="link_<?= $tipo ?>" type="url" name="links[<?= $tipo ?>]" maxlength="500" value="<?= hFormularioEvento($linksForm[$tipo]) ?>" placeholder="https://..."></div>
+            <?php endforeach; ?>
+        </div>
+
+        <?php if (!$temOrganizador && !$emEdicao): ?>
+            <h2>Seu cadastro de organizador</h2>
+            <div class="campo-evento">
+                <label for="tipo_organizador">Que tipo de organizador você é? *</label>
+                <input id="tipo_organizador" name="tipo_organizador" maxlength="50" required value="<?= hFormularioEvento($dadosEvento['tipo_organizador'] ?? '') ?>" placeholder="Ex.: artista, produtor, espaço cultural">
+            </div>
+        <?php endif; ?>
+
+        <div class="acoes-formulario-evento">
+            <button type="submit" class="botao-organizador"><?= $emEdicao ? 'Salvar alterações' : 'Cadastrar evento' ?></button>
+            <a class="link-voltar-eventos" href="index.php?pagina=organizador">Cancelar</a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('sessoes-evento');
+    const botao = document.getElementById('adicionar-sessao-evento');
+    let proximoIndice = container.querySelectorAll('.linha-sessao-evento').length;
+
+    function adicionarSessao() {
+        const linha = document.createElement('div');
+        linha.className = 'linha-sessao-evento';
+        linha.innerHTML = '<div class="campo-evento"><label>Data *</label><input type="date" name="sessoes[' + proximoIndice + '][data_evento]"></div>' +
+            '<div class="campo-evento"><label>Início *</label><input type="time" name="sessoes[' + proximoIndice + '][horario_inicio]"></div>' +
+            '<div class="campo-evento"><label>Término</label><input type="time" name="sessoes[' + proximoIndice + '][horario_fim]"></div>' +
+            '<button type="button" class="botao-remover-sessao" aria-label="Remover data">Remover</button>';
+        container.appendChild(linha);
+        proximoIndice++;
+    }
+
+    botao.addEventListener('click', adicionarSessao);
+    container.addEventListener('click', function (evento) {
+        if (evento.target.classList.contains('botao-remover-sessao')) {
+            const linhas = container.querySelectorAll('.linha-sessao-evento');
+            if (linhas.length > 1) evento.target.closest('.linha-sessao-evento').remove();
+        }
+    });
+});
+</script>

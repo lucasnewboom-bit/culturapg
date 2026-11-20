@@ -1,0 +1,3001 @@
+
+/* ============================================
+   CULTURAPG - FOLHA DE ESTILOS PRINCIPAL
+============================================ */
+
+/* 1. VARIÁVEIS VISUAIS */
+
+:root {
+    --cor-fundo: #080522;
+    --cor-superficie: #493b48;
+    --cor-superficie-escura: #310d30;
+
+    --cor-roxo: #8425c7;
+    --cor-magenta: #d414b8;
+    --cor-azul: #2865f5;
+
+    --cor-texto: #ffffff;
+    --cor-texto-secundario: #c5bac8;
+    --cor-borda: #69576a;
+}
+
+
+/* 2. RESET E CONFIGURAÇÕES GERAIS */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+}
+
+
+/* 3. CABEÇALHO PRINCIPAL */
+
+.cabecalho {
+    background-color: var(--cor-superficie-escura);
+    border-bottom: 1px solid var(--cor-borda);
+
+    height: 62px;
+    padding: 0 5%;
+
+    position: relative;
+    z-index: 2000;
+}
+
+.cabecalho .container {
+    width: 100%;
+    max-width: 1440px;
+    height: 100%;
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+
+/* 4. LOGO CULTURAPG */
+
+.logo {
+    color: var(--cor-texto);
+    font-size: 29px;
+    font-weight: bold;
+    letter-spacing: -1.5px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.logo span {
+    color: var(--cor-roxo);
+}
+
+
+/* 5. MENU DE NAVEGAÇÃO */
+
+.menu-principal {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 30px;
+}
+
+.menu-principal a {
+    color: var(--cor-texto);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.menu-principal a:hover {
+    color: var(--cor-magenta);
+}
+
+
+/* 6. CONTEÚDO GERAL */
+
+.conteudo {
+    max-width: 1440px;
+    width: 90%;
+    margin: 35px auto;
+    min-height: 70vh;
+}
+
+h2 {
+    font-size: 26px;
+    margin-bottom: 25px;
+}
+
+
+/* ============================================
+   7. ÁREA DE CATEGORIAS
+============================================ */
+
+.secao-categorias {
+    background-color: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.secao-categorias h2 {
+    margin-bottom: 25px;
+}
+
+.secao-categorias table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.secao-categorias th,
+.secao-categorias td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.secao-categorias th {
+    background-color: var(--cor-superficie-escura);
+    color: var(--cor-texto);
+}
+
+.secao-categorias tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.secao-categorias a {
+    color: #dca2ff;
+    text-decoration: none;
+}
+
+.secao-categorias a:hover {
+    color: var(--cor-magenta);
+}
+
+
+/* ============================================
+   8. MAPA PRINCIPAL - TELA INTEIRA
+============================================ */
+
+/* Remove as limitações do conteúdo na página do mapa */
+
+body:has(.pagina-mapa) .conteudo {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+}
+
+/* Área principal do mapa */
+
+.pagina-mapa {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 62px);
+    overflow: hidden;
+}
+
+/* Mapa Leaflet */
+
+#mapa {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    border-radius: 0;
+
+    z-index: 1;
+}
+
+/* Tema escuro do mapa */
+
+.leaflet-tile-pane {
+    filter:
+        invert(1)
+        hue-rotate(200deg)
+        brightness(0.75)
+        saturate(0.65)
+        contrast(0.9);
+}
+
+/* Mantém os controles do Leaflet normais */
+
+.leaflet-control {
+    filter: none;
+}
+
+
+/* ============================================
+   9. CONTROLES FLUTUANTES DO MAPA
+============================================ */
+
+.controles-mapa {
+    position: absolute;
+
+    top: 20px;
+    left: 30px;
+    right: 30px;
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+
+    pointer-events: none;
+}
+
+/* Título flutuante */
+
+.titulo-mapa {
+    background: rgba(8, 5, 34, 0.88);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+
+    padding: 14px 18px;
+
+    pointer-events: auto;
+}
+
+.titulo-mapa h2 {
+    font-size: 21px;
+    margin-bottom: 5px;
+}
+
+.titulo-mapa p {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+}
+
+
+/* Filtros flutuantes */
+
+.filtros-mapa {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    pointer-events: auto;
+}
+
+.filtros-mapa select {
+    background: rgba(8, 5, 34, 0.90);
+    backdrop-filter: blur(10px);
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+
+    padding: 12px 15px;
+
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.filtros-mapa select option {
+    background-color: var(--cor-superficie-escura);
+    color: white;
+}
+
+
+/* ============================================
+   10. RODAPÉ
+============================================ */
+
+.rodape {
+    background-color: var(--cor-superficie-escura);
+    border-top: 1px solid var(--cor-borda);
+
+    padding: 20px;
+
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+}
+
+/* Esconde o rodapé somente na página do mapa */
+
+body:has(.pagina-mapa) .rodape {
+    display: none;
+}
+
+
+/* ============================================
+   11. RESPONSIVIDADE - TABLETS E CELULARES
+============================================ */
+
+@media (max-width: 768px) {
+
+    /* Cabeçalho */
+
+    .cabecalho {
+        height: auto;
+        min-height: 62px;
+        padding: 12px 4%;
+    }
+
+    .cabecalho .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .logo {
+        font-size: 27px;
+    }
+
+    .menu-principal {
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .menu-principal a {
+        font-size: 13px;
+    }
+
+    /* Conteúdo geral */
+
+    .conteudo {
+        width: 94%;
+        margin: 25px auto;
+    }
+
+    /* Tabela */
+
+    .secao-categorias {
+        padding: 18px;
+        overflow-x: auto;
+    }
+
+    .secao-categorias table {
+        min-width: 500px;
+    }
+
+    /* Mapa */
+
+    .pagina-mapa {
+        height: calc(100vh - 110px);
+    }
+
+    /* Controles flutuantes */
+
+    .controles-mapa {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .titulo-mapa {
+        width: fit-content;
+    }
+
+    .titulo-mapa h2 {
+        font-size: 18px;
+    }
+
+    .filtros-mapa {
+        width: 100%;
+    }
+
+    .filtros-mapa select {
+        flex: 1;
+        min-width: 0;
+        font-size: 12px;
+        padding: 10px;
+    }
+
+}
+
+
+/* ============================================
+   12. TELAS MUITO PEQUENAS
+============================================ */
+
+@media (max-width: 400px) {
+
+    .menu-principal {
+        gap: 10px;
+    }
+
+    .menu-principal a {
+        font-size: 12px;
+    }
+
+    .titulo-mapa h2 {
+        font-size: 16px;
+    }
+
+    .titulo-mapa p {
+        font-size: 11px;
+    }
+
+}
+
+/* ============================================
+   PINS PERSONALIZADOS - CULTURAPG
+============================================ */
+
+.pin-evento {
+    width: 42px;
+    height: 42px;
+    border: 3px solid #ffffff;
+    border-radius: 50% 50% 50% 5px;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+.pin-evento span {
+    transform: rotate(45deg);
+    font-size: 23px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.pin-musica {
+    background: #2865f5;
+    color: #ffffff;
+}
+
+.pin-teatro {
+    background: #d414b8;
+    color: #ffffff;
+}
+
+.pin-danca {
+    background: #eacb36;
+    color: #171020;
+}
+
+/* Agrupamentos de eventos */
+
+.marker-cluster {
+    background-color: rgba(132, 37, 199, 0.35);
+}
+
+.marker-cluster div {
+    background-color: #8425c7;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* ============================================
+   MARCADORES PERSONALIZADOS CULTURAPG
+============================================ */
+
+.marcador-culturapg {
+    background: transparent;
+    border: none;
+    position: relative;
+}
+
+.marcador-culturapg svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+.quantidade-pin {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+
+    min-width: 19px;
+    height: 19px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+    color: #171020;
+
+    border: 1px solid #171020;
+    border-radius: 50%;
+
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* Cartão de informações */
+
+.popup-culturapg h3 {
+    color: #310d30;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.evento-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 0;
+    border-top: 1px solid #ddd;
+}
+
+.evento-popup strong {
+    color: #222;
+    font-size: 13px;
+}
+
+.evento-popup small {
+    color: #8425c7;
+    font-size: 11px;
+}
+
+/* ============================================
+   POPUP DE EVENTOS - CULTURAPG
+============================================ */
+
+.popup-culturapg {
+    min-width: 190px;
+    max-width: 260px;
+    font-family: Arial, sans-serif;
+}
+
+.popup-culturapg h3 {
+    color: #310d30;
+    font-size: 16px;
+    margin: 0 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.evento-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 9px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.evento-titulo {
+    color: #25202a;
+    font-size: 14px;
+}
+
+.evento-categoria {
+    color: #8425c7;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.sessoes-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.sessao-popup {
+    background: #f0eaf2;
+    color: #352b38;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 11px;
+}
+
+.sem-sessoes {
+    color: #777;
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* ============================================
+   PÁGINA DE DETALHES DO EVENTO
+============================================ */
+
+.pagina-evento {
+    width: min(100% - 40px, 1000px);
+    margin: 35px auto;
+    color: #ffffff;
+}
+
+
+.evento-capa {
+    background-color: #310d30;
+
+    background-image:
+        linear-gradient(
+            to top,
+            rgba(8, 5, 34, 0.95) 0%,
+            rgba(49, 13, 48, 0.45) 55%,
+            rgba(8, 5, 34, 0.10) 100%
+        ),
+        var(--imagem-capa);
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    min-height: 420px;
+    padding: 35px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    position: relative;
+
+    border-radius: 14px 14px 0 0;
+    border-bottom: 3px solid #d414b8;
+}
+
+.evento-capa h1 {
+    font-size: clamp(25px, 4vw, 36px);
+    margin-top: 12px;
+}
+
+.evento-categoria {
+    color: #dca0ff;
+    font-weight: bold;
+}
+
+.evento-conteudo {
+    background: #493b48;
+    padding: 30px;
+    border-radius: 0 0 14px 14px;
+}
+
+.evento-conteudo section {
+    margin-bottom: 30px;
+}
+
+.evento-conteudo h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #ffffff;
+}
+
+.evento-conteudo p {
+    line-height: 1.6;
+    color: #eee5ef;
+}
+
+.informacao-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #756477;
+}
+
+.informacao-item strong {
+    color: #e0a0ff;
+}
+
+.sessao-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #310d30;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.botao-contato {
+    display: inline-block;
+    background: #a020d0;
+    color: white;
+    text-decoration: none;
+    padding: 13px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.botao-contato:hover {
+    background: #7d16a5;
+    color: white;
+}
+
+@media (max-width: 600px) {
+
+    .pagina-evento {
+        width: calc(100% - 24px);
+        margin: 18px auto;
+    }
+
+    .evento-capa,
+    .evento-conteudo {
+        padding: 20px;
+    }
+
+}
+
+/* =================================
+   MODAL DE DETALHES DO EVENTO
+================================= */
+
+.modal-evento {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Modal aberto */
+
+.modal-evento.aberto {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Fundo escuro e desfocado */
+
+.modal-fundo {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(8, 5, 34, 0.72);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+/* Painel principal */
+
+.modal-painel {
+    position: relative;
+    z-index: 1;
+
+    width: min(900px, 90%);
+    max-height: 85vh;
+    overflow-y: auto;
+
+    background: #493b48;
+    color: #ffffff;
+
+    border-radius: 14px;
+    box-shadow: 0 15px 60px rgba(0, 0, 0, 0.45);
+
+    padding: 35px;
+
+    transform: translateY(25px) scale(0.97);
+    opacity: 0;
+
+    transition:
+        transform 0.35s ease,
+        opacity 0.35s ease;
+}
+
+/* Animação de entrada */
+
+.modal-evento.aberto .modal-painel {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* Botão fechar */
+
+.modal-fechar {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+
+    background: transparent;
+    border: none;
+
+    color: #ffffff;
+    font-size: 32px;
+    cursor: pointer;
+
+    z-index: 2;
+}
+
+.modal-fechar:hover {
+    color: #d414b8;
+}
+
+/* Ajustes para telas menores */
+
+@media (max-width: 600px) {
+
+    .modal-painel {
+        width: 94%;
+        max-height: 90vh;
+        padding: 25px 18px;
+    }
+
+}
+
+/* ========================================
+   CALENDÁRIO INDIVIDUAL DOS EVENTOS
+======================================== */
+
+.calendario-evento {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 18px;
+}
+
+.dias-calendario {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 9px;
+    flex: 1;
+}
+
+.dia-calendario {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    min-width: 0;
+    min-height: 66px;
+    padding: 9px 3px;
+
+    background: #302535;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 9px;
+
+    color: #c5bac8;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.dia-calendario strong {
+    font-size: 19px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.dia-calendario span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Dia em que o evento acontece */
+
+.dia-calendario.dia-evento {
+    background: var(--cor-evento);
+    border-color: var(--cor-evento);
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transform: translateY(-3px);
+}
+
+.dia-calendario.dia-evento strong,
+.dia-calendario.dia-evento span {
+    color: #ffffff;
+}
+
+/* Setas de navegação */
+
+.navegar-calendario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+    width: 30px;
+    height: 36px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #310d30;
+    color: #ffffff;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.navegar-calendario:hover {
+    background: #8425c7;
+}
+
+/* Ajustes para telas menores */
+
+@media (max-width: 600px) {
+
+    .dias-calendario {
+        gap: 4px;
+    }
+
+    .dia-calendario {
+        min-height: 58px;
+        padding: 7px 2px;
+    }
+
+    .dia-calendario strong {
+        font-size: 16px;
+    }
+
+    .dia-calendario span {
+        font-size: 9px;
+    }
+
+    .navegar-calendario {
+        width: 24px;
+    }
+
+}
+
+/* ÍCONES DOS EVENTOS NO CALENDÁRIO */
+
+.icones-dia {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 3px;
+}
+
+.icone-evento-calendario {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 22px;
+    height: 22px;
+    padding: 0;
+
+    border: 1px solid rgba(255,255,255,0.65);
+    border-radius: 5px;
+
+    background: var(--cor-icone);
+    color: #ffffff;
+
+    font-size: 13px;
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+}
+
+.icone-evento-calendario:hover {
+    transform: scale(1.18);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.dia-calendario {
+    min-height: 82px;
+}
+
+/* ========================================
+   INTERAÇÃO DOS DIAS DO CALENDÁRIO
+======================================== */
+
+.dia-clicavel {
+    cursor: pointer;
+
+    transition:
+        transform 0.16s ease,
+        filter 0.16s ease,
+        box-shadow 0.16s ease;
+}
+
+.dia-clicavel:hover {
+    filter: brightness(1.2);
+    transform: translateY(-3px);
+
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
+}
+
+.dia-clicavel:active {
+    transform: scale(0.94);
+
+    filter: brightness(0.85);
+
+    box-shadow: none;
+}
+
+.dia-clicavel:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}
+
+/* Animação individual dos ícones */
+
+.icone-evento-calendario {
+    transition:
+        transform 0.16s ease,
+        filter 0.16s ease;
+}
+
+.icone-evento-calendario:active {
+    transform: scale(0.82);
+    filter: brightness(0.8);
+}
+
+/* ========================================
+   CALENDÁRIO - CORES E ÍCONES
+======================================== */
+
+/* O dia permanece na cor do evento */
+
+.dia-clicavel {
+    background-color: var(--cor-evento) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.16s ease,
+        filter 0.16s ease,
+        box-shadow 0.16s ease;
+}
+
+/* Efeito ao passar o mouse */
+
+.dia-clicavel:hover {
+    filter: brightness(1.15);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Animação ao clicar */
+
+.dia-clicavel:active {
+    transform: scale(0.94);
+    filter: brightness(0.85);
+    box-shadow: none;
+}
+
+/* Ícones sem borda ou fundo */
+
+.icone-evento-calendario {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    color: #ffffff;
+    font-size: 17px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.16s ease,
+        filter 0.16s ease;
+}
+
+/* Animação individual dos ícones */
+
+.icone-evento-calendario:active {
+    transform: scale(0.8);
+    filter: brightness(0.8);
+}
+
+/* ========================================
+   CULTURAPG - POPUPS PERSONALIZADOS
+======================================== */
+
+/* Caixa principal do Leaflet */
+
+.leaflet-popup-content-wrapper {
+    background: #130d25 !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(132, 37, 199, 0.65);
+    border-radius: 16px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55) !important;
+    padding: 5px;
+}
+
+/* Ponteira do popup */
+
+.leaflet-popup-tip {
+    background: #130d25 !important;
+    border: 1px solid rgba(132, 37, 199, 0.4);
+}
+
+/* Conteúdo */
+
+.leaflet-popup-content {
+    margin: 14px 16px !important;
+    width: 260px !important;
+    color: #ffffff;
+}
+
+/* Botão de fechar */
+
+.leaflet-container a.leaflet-popup-close-button {
+    color: #c5bac8 !important;
+    font-size: 21px !important;
+    padding: 9px 11px 0 0 !important;
+    transition: color 0.2s ease;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+    color: #ec28c4 !important;
+}
+
+/* Identificação do local */
+
+.popup-culturapg h3 {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0 22px 14px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Cartão individual do evento */
+
+.evento-popup {
+    background: #211735;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 11px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s ease;
+}
+
+.evento-popup:hover {
+    border-color: rgba(212, 20, 184, 0.5);
+}
+
+/* Nome do evento */
+
+.evento-titulo {
+    display: block;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 5px;
+}
+
+/* Categoria */
+
+.evento-categoria {
+    display: inline-block;
+    color: #ec28c4;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+/* Área das sessões */
+
+.sessoes-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.sessao-popup {
+    background: rgba(132, 37, 199, 0.17);
+    border: 1px solid rgba(132, 37, 199, 0.2);
+    border-radius: 7px;
+    padding: 7px 9px;
+}
+
+.sessao-popup span {
+    color: #e5d8f0;
+    font-size: 11px;
+}
+
+/* Quando não existem sessões */
+
+.sem-sessoes {
+    color: #a99bb5;
+    font-size: 11px;
+}
+
+/* Botão de detalhes */
+
+.botao-detalhes {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none !important;
+
+    background: linear-gradient(110deg, #8425c7, #d414b8);
+    color: #ffffff !important;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    padding: 9px 12px;
+    border-radius: 7px;
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.botao-detalhes:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 20, 184, 0.3);
+}
+
+.botao-detalhes:active {
+    transform: scale(0.97);
+}
+/* Nome dos eventos nos pop-ups */
+.evento-popup .evento-titulo {
+    color: #ffffff !important;
+}
+/* Contorno branco no botão do evento atualmente aberto */
+.dia-calendario.dia-evento-atual {
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.45);
+}
+
+/* ============================================
+   CULTURAPG - IMAGENS DOS EVENTOS
+============================================ */
+
+
+/* ============================================
+   1. IMAGEM PRINCIPAL DOS DETALHES
+============================================ */
+
+.evento-capa {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 260px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+
+    padding: 35px;
+
+    background-color: #211735;
+
+    background-image:
+        linear-gradient(
+            to top,
+            #493b48 0%,
+            rgba(73, 59, 72, 0.85) 18%,
+            rgba(8, 5, 34, 0.25) 65%,
+            rgba(8, 5, 34, 0.05) 100%
+        ),
+        var(--imagem-capa);
+
+    background-size: cover;
+    background-position: center;
+
+    overflow: hidden;
+
+    border-radius: 12px 12px 0 0;
+    border-bottom: 3px solid #d414b8;
+}
+
+.evento-capa .evento-categoria,
+.evento-capa h1 {
+    position: relative;
+    z-index: 1;
+}
+
+.evento-capa .evento-categoria {
+    display: inline-block;
+
+    margin-bottom: 12px;
+    padding: 7px 13px;
+
+    background: rgba(132, 37, 199, 0.9);
+
+    border-radius: 20px;
+
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.evento-capa h1 {
+    max-width: 850px;
+
+    color: #ffffff;
+
+    font-size: 32px;
+    font-weight: bold;
+
+    line-height: 1.2;
+
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+
+/* ============================================
+   2. IMAGENS DOS POPUPS DO MAPA
+============================================ */
+
+.evento-popup {
+    position: relative;
+
+    overflow: hidden;
+
+    background-color: #211735;
+
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(33, 23, 53, 0.98) 0%,
+            rgba(33, 23, 53, 0.92) 38%,
+            rgba(33, 23, 53, 0.65) 70%,
+            rgba(33, 23, 53, 0.25) 100%
+        ),
+        var(--imagem-popup);
+
+    background-size: cover;
+    background-position: center;
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    margin-bottom: 12px;
+}
+
+
+/* Título do evento */
+
+.evento-popup .evento-titulo {
+    display: block;
+
+    position: relative;
+    z-index: 1;
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    line-height: 1.3;
+
+    margin-bottom: 8px;
+
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+
+/* Categoria */
+
+.evento-popup .evento-categoria {
+    display: inline-block;
+
+    position: relative;
+    z-index: 1;
+
+    color: #e5b5ff;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+
+/* Sessões */
+
+.evento-popup .sessoes-popup {
+    position: relative;
+    z-index: 1;
+
+    margin-bottom: 12px;
+}
+
+.evento-popup .sessao-popup {
+    color: #ffffff;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+}
+
+.evento-popup .sem-sessoes {
+    color: #c5bac8;
+
+    font-size: 12px;
+}
+
+
+/* Botão de detalhes */
+
+.evento-popup .botao-detalhes {
+    position: relative;
+    z-index: 1;
+
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    background-color: #8425c7;
+
+    border-radius: 6px;
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    text-decoration: none;
+
+    transition: background-color 0.2s;
+}
+
+.evento-popup .botao-detalhes:hover {
+    background-color: #d414b8;
+}
+
+
+/* ============================================
+   3. RESPONSIVIDADE
+============================================ */
+
+@media (max-width: 768px) {
+
+    .evento-capa {
+        min-height: 220px;
+        padding: 22px;
+    }
+
+    .evento-capa h1 {
+        font-size: 24px;
+    }
+
+    .evento-popup {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .evento-capa {
+        min-height: 190px;
+        padding: 16px;
+    }
+
+    .evento-capa h1 {
+        font-size: 20px;
+    }
+}
+
+/* =========================================
+   BOTÕES DE CONTATO DOS EVENTOS
+========================================= */
+
+.botoes-contato {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.botao-contato {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.botao-contato:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.botao-contato svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* WHATSAPP */
+
+.botao-contato-whatsapp {
+    background: #25D366;
+    color: #ffffff;
+}
+
+/* INSTAGRAM */
+
+.botao-contato-instagram {
+    background: linear-gradient(
+        45deg,
+        #feda75,
+        #fa7e1e,
+        #d62976,
+        #962fbf,
+        #4f5bd5
+    );
+    color: #ffffff;
+}
+
+/* SYMPLA */
+
+.botao-contato-sympla {
+    background: #f36f36;
+    color: #ffffff;
+}
+
+/* MENSAGEM DE CONTATO */
+
+.mensagem-contato {
+    margin-top: 10px;
+    color: #c5bac8;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   DISPONIBILIDADE E HORÁRIOS NO MODAL
+========================================= */
+
+.ingressos-disponiveis-modal {
+    display: inline-block;
+    margin-top: 5px;
+    color: #00e676;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.informacao-sessoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.horario-sessao-modal {
+    padding: 10px 12px;
+    background: rgba(132, 37, 199, 0.12);
+    border-left: 3px solid #8425c7;
+    border-radius: 6px;
+}
+
+.data-sessao-modal {
+    color: #dca1ff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.horario-sessao-modal p {
+    margin: 4px 0 0;
+    color: #ffffff;
+}
+
+/* =========================================
+   CULTURAPG - AUTENTICAÇÃO
+========================================= */
+
+.pagina-autenticacao {
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 15px;
+}
+
+.cartao-autenticacao {
+    width: 100%;
+    max-width: 460px;
+    padding: 35px;
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 16px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+.cartao-autenticacao h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.subtitulo-autenticacao {
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.campo-autenticacao {
+    margin-bottom: 18px;
+}
+
+.campo-autenticacao label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.campo-autenticacao input {
+    width: 100%;
+    padding: 13px 14px;
+    background: var(--cor-fundo);
+    color: white;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.campo-autenticacao input:focus {
+    border-color: var(--cor-roxo);
+    box-shadow: 0 0 0 2px rgba(132, 37, 199, 0.2);
+}
+
+.botao-autenticacao {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(110deg, #8425c7, #d414b8);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.botao-autenticacao:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+}
+
+.link-autenticacao {
+    margin-top: 22px;
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+}
+
+.link-autenticacao a {
+    color: #dca2ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-autenticacao a:hover {
+    color: var(--cor-magenta);
+}
+
+.mensagem-autenticacao {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: rgba(212, 20, 184, 0.12);
+    border: 1px solid var(--cor-magenta);
+    color: white;
+    font-size: 13px;
+}
+
+@media (max-width: 500px) {
+    .cartao-autenticacao {
+        padding: 25px 20px;
+    }
+}
+
+/* =========================================
+   CULTURAPG - AUTENTICAÇÃO MODERNA
+========================================= */
+
+.pagina-autenticacao {
+    min-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 45px 20px;
+    position: relative;
+}
+
+.cartao-autenticacao {
+    width: 100%;
+    max-width: 410px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.logo-autenticacao {
+    width: 100%;
+    max-width: 390px;
+    margin: 0 auto 35px;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-autenticacao img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.cartao-autenticacao h1 {
+    text-align: center;
+    font-size: 23px;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.subtitulo-autenticacao {
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    margin-bottom: 28px;
+}
+
+.campo-autenticacao {
+    margin-bottom: 19px;
+}
+
+.campo-autenticacao label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.campo-autenticacao input {
+    width: 100%;
+    padding: 14px 15px;
+    background: rgba(73, 59, 72, 0.35);
+    color: white;
+    border: 1px solid rgba(197, 186, 200, 0.35);
+    border-radius: 9px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.campo-autenticacao input:focus {
+    border-color: var(--cor-roxo);
+    background: rgba(73, 59, 72, 0.6);
+    box-shadow: 0 0 0 3px rgba(132, 37, 199, 0.12);
+}
+
+.botao-autenticacao {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(110deg, #8425c7, #d414b8);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.botao-autenticacao:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 20, 184, 0.2);
+}
+
+.link-autenticacao {
+    margin-top: 25px;
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+}
+
+.link-autenticacao a {
+    color: #dca2ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-autenticacao a:hover {
+    color: var(--cor-magenta);
+}
+
+.mensagem-autenticacao {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: rgba(212, 20, 184, 0.12);
+    border: 1px solid var(--cor-magenta);
+    color: white;
+    font-size: 13px;
+}
+
+@media (max-width: 500px) {
+    .pagina-autenticacao {
+        padding: 35px 20px;
+    }
+
+    .logo-autenticacao {
+        max-width: 310px;
+        margin-bottom: 30px;
+    }
+
+    .cartao-autenticacao {
+        max-width: 100%;
+    }
+}
+/* LOGO OFICIAL NO CABEÇALHO */
+
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo img {
+    display: block;
+    width: 190px;
+    height: 52px;
+    object-fit: contain;
+    object-position: left center;
+}
+
+/* ==========================================
+   PÁGINA DE PERFIL
+========================================== */
+
+.pagina-perfil {
+    width: 100%;
+    max-width: 1100px;
+    margin: 55px auto;
+    padding: 0 25px;
+    color: var(--cor-texto);
+}
+
+.cabecalho-perfil {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 35px 20px;
+    margin-bottom: 30px;
+    background: rgba(73, 59, 72, 0.25);
+    border: 1px solid rgba(197, 186, 200, 0.12);
+    border-radius: 16px;
+}
+
+.avatar-perfil {
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8425c7, #2865f5, #d414b8);
+    color: white;
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 25px rgba(132, 37, 199, 0.3);
+}
+
+.cabecalho-perfil h1 {
+    font-size: 27px;
+    margin: 0 0 6px;
+}
+
+.cabecalho-perfil p {
+    color: var(--cor-texto-secundario);
+    margin: 0;
+    font-size: 15px;
+}
+
+.informacoes-perfil {
+    background: rgba(73, 59, 72, 0.25);
+    border: 1px solid rgba(197, 186, 200, 0.12);
+    border-radius: 16px;
+    padding: 30px;
+}
+
+.informacoes-perfil h2 {
+    font-size: 20px;
+    margin: 0 0 25px;
+}
+
+.item-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 17px 0;
+    border-bottom: 1px solid rgba(197, 186, 200, 0.15);
+}
+
+.item-perfil:last-child {
+    border-bottom: none;
+}
+
+.item-perfil span {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+}
+
+.item-perfil strong {
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .pagina-perfil {
+        margin: 30px auto;
+        padding: 0 15px;
+    }
+
+    .informacoes-perfil {
+        padding: 22px;
+    }
+
+    .cabecalho-perfil h1 {
+        font-size: 23px;
+    }
+}
+
+/* ==========================================
+   HISTÓRICO DE EVENTOS NO PERFIL
+========================================== */
+
+.historico-perfil {
+    margin-top: 30px;
+    padding: 30px;
+    background: rgba(73, 59, 72, 0.25);
+    border: 1px solid rgba(197, 186, 200, 0.12);
+    border-radius: 16px;
+}
+
+.historico-perfil h2 {
+    font-size: 20px;
+    margin: 0 0 25px;
+}
+
+.historico-vazio {
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+}
+
+.lista-historico {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-historico {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(197, 186, 200, 0.15);
+    color: white;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.item-historico:last-child {
+    border-bottom: none;
+}
+
+.item-historico:hover {
+    background: rgba(132, 37, 199, 0.08);
+}
+
+.item-historico img {
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.dados-historico {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    flex: 1;
+}
+
+.dados-historico strong {
+    font-size: 15px;
+}
+
+.dados-historico span {
+    color: #dca2ff;
+    font-size: 13px;
+}
+
+.dados-historico small {
+    color: var(--cor-texto-secundario);
+    font-size: 11px;
+}
+
+.seta-historico {
+    font-size: 25px;
+    color: #dca2ff;
+}
+
+@media (max-width: 600px) {
+    .historico-perfil {
+        padding: 22px;
+    }
+
+    .item-historico img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .dados-historico strong {
+        font-size: 13px;
+    }
+}
+
+/* BOTÃO VOLTAR DOS EVENTOS */
+
+.botao-voltar-evento {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    padding: 10px 17px;
+    color: white;
+    background: #493b48;
+    border: 1px solid rgba(197, 186, 200, 0.2);
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.botao-voltar-evento:hover {
+    background: #8425c7;
+    color: white;
+}
+
+/* BOTÃO DE INGRESSOS */
+
+.botao-ingressos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px 22px;
+    background: linear-gradient(110deg, #8425c7, #d414b8);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+    border-radius: 9px;
+    transition: 0.2s;
+}
+
+.botao-ingressos:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* ============================================
+   CATÁLOGO DE EVENTOS
+============================================ */
+
+.pagina-catalogo {
+    width: min(1200px, 92%);
+    margin: 45px auto 80px;
+    color: #fff;
+}
+
+.cabecalho-catalogo {
+    padding: 45px 40px;
+    margin-bottom: 30px;
+    border-radius: 18px;
+    background: linear-gradient(115deg, #310d30, #202052, #080522);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.subtitulo-catalogo {
+    color: #d414b8;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+.cabecalho-catalogo h1 {
+    margin: 12px 0;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+}
+
+.cabecalho-catalogo p {
+    color: #c5bac8;
+    font-size: 16px;
+    margin: 0;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* PESQUISA E FILTROS */
+
+.filtros-catalogo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.pesquisa-catalogo {
+    flex: 1;
+    min-width: 240px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 18px;
+    height: 52px;
+    border-radius: 10px;
+    background: #493b48;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.pesquisa-catalogo span {
+    font-size: 25px;
+    color: #d414b8;
+}
+
+.pesquisa-catalogo input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #fff;
+    font-size: 15px;
+}
+
+.pesquisa-catalogo input::placeholder {
+    color: #c5bac8;
+}
+
+.opcoes-filtro-catalogo {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.opcoes-filtro-catalogo select {
+    height: 52px;
+    min-width: 175px;
+    padding: 0 14px;
+    border-radius: 10px;
+    background: #493b48;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.opcoes-filtro-catalogo select option {
+    background: #310d30;
+    color: #fff;
+}
+
+/* RESULTADOS */
+
+.cabecalho-resultados {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.cabecalho-resultados h2 {
+    font-size: 23px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.cabecalho-resultados span {
+    color: #c5bac8;
+    font-size: 14px;
+}
+
+/* CARTÕES */
+
+.grade-eventos-catalogo {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 25px;
+}
+
+.card-evento-catalogo {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    background: #241b2b;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 15px;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.card-evento-catalogo:hover {
+    transform: translateY(-6px);
+    border-color: #8425c7;
+    color: #fff;
+}
+
+.imagem-card-catalogo {
+    height: 190px;
+    position: relative;
+    overflow: hidden;
+    background: #310d30;
+}
+
+.imagem-card-catalogo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.card-evento-catalogo:hover .imagem-card-catalogo img {
+    transform: scale(1.05);
+}
+
+.imagem-padrao-catalogo {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #310d30, #2865f5);
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.categoria-card-catalogo {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: rgba(8,5,34,0.9);
+    color: #eacb36;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.conteudo-card-catalogo {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.conteudo-card-catalogo h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 18px;
+    min-height: 46px;
+    line-height: 1.4;
+}
+
+.data-card-catalogo,
+.local-card-catalogo {
+    color: #c5bac8;
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+.rodape-card-catalogo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 18px;
+}
+
+.rodape-card-catalogo strong {
+    color: #eacb36;
+    font-size: 15px;
+}
+
+.rodape-card-catalogo span {
+    color: #d414b8;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.catalogo-vazio {
+    padding: 35px 20px;
+    text-align: center;
+    color: #c5bac8;
+    background: #241b2b;
+    border-radius: 12px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 900px) {
+    .grade-eventos-catalogo {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .pagina-catalogo {
+        margin-top: 25px;
+    }
+
+    .cabecalho-catalogo {
+        padding: 30px 22px;
+    }
+
+    .filtros-catalogo {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pesquisa-catalogo {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .opcoes-filtro-catalogo {
+        flex-direction: column;
+    }
+
+    .opcoes-filtro-catalogo select {
+        width: 100%;
+    }
+
+    .grade-eventos-catalogo {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho-resultados {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* FILTRO DE FAVORITOS DO CATÁLOGO */
+
+.seletor-favoritos-catalogo {
+    display: flex;
+    gap: 12px;
+    margin: -20px 0 35px;
+}
+
+.seletor-favoritos-catalogo button {
+    padding: 11px 20px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #493b48;
+    color: #c5bac8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.seletor-favoritos-catalogo button:hover {
+    border-color: #8425c7;
+    color: #fff;
+}
+
+.seletor-favoritos-catalogo button.ativo {
+    background: #8425c7;
+    border-color: #8425c7;
+    color: #fff;
+}
+
+@media (max-width: 600px) {
+    .seletor-favoritos-catalogo {
+        flex-direction: column;
+    }
+
+    .seletor-favoritos-catalogo button {
+        width: 100%;
+    }
+}
+
+/* CORAÇÃO DE FAVORITOS - DETALHES DO EVENTO */
+
+.evento-capa {
+    position: relative;
+}
+
+.form-favorito-evento {
+    position: absolute;
+    top: 22px;
+    right: 25px;
+    margin: 0;
+    z-index: 5;
+}
+
+.botao-favorito-evento {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(8, 5, 34, 0.75);
+    color: #b8b8b8;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.botao-favorito-evento:hover {
+    transform: scale(1.12);
+    color: #ff3030;
+}
+
+.botao-favorito-evento.favoritado {
+    color: #ff3030;
+}
+
+.botao-favorito-evento.favoritado:hover {
+    color: #b8b8b8;
+}
+
+.botao-favorito-evento:hover {
+    transform: scale(1.12);
+    color: #ff3030;
+}
+
+.botao-favorito-evento.favoritado {
+    color: #ff3030;
+}
+
+.botao-favorito-evento.favoritado:hover {
+    color: #b8b8b8;
+}
+
+.botao-favorito-evento:hover {
+    transform: scale(1.12);
+    color: #ff3030;
+}
+
+.botao-favorito-evento.favoritado {
+    color: #ff3030;
+}
+
+.botao-favorito-evento.favoritado:hover {
+    color: #b8b8b8;
+}
+
+/* =========================================
+   CORAÇÕES DE FAVORITOS - MAPA
+========================================= */
+
+.cabecalho-evento-popup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.coracao-favorito-popup {
+    flex-shrink: 0;
+    color: #b8b8b8;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.coracao-favorito-popup.favoritado {
+    color: #ff3030;
+}
+
+/* Coração na janela de detalhes do mapa */
+
+.evento-capa {
+    position: relative;
+}
+
+.coracao-favorito-modal {
+    position: absolute;
+    top: 22px;
+    right: 25px;
+    z-index: 5;
+
+    color: #b8b8b8;
+    font-size: 36px;
+    line-height: 1;
+}
+
+.coracao-favorito-modal.favoritado {
+    color: #ff3030;
+}
+.coracao-favorito-modal {
+    background: transparent;
+    border: none;
+    padding: 0;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* =========================================
+   ÁREA DO ORGANIZADOR
+========================================= */
+
+.area-organizador {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    margin-top: 30px;
+    padding: 28px;
+
+    background: linear-gradient(
+        135deg,
+        #310d30,
+        #493b48
+    );
+
+    border: 1px solid #8425c7;
+    border-radius: 16px;
+}
+
+.icone-organizador {
+    flex-shrink: 0;
+
+    width: 65px;
+    height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(132, 37, 199, 0.25);
+    border-radius: 14px;
+
+    font-size: 32px;
+}
+
+.conteudo-organizador h2 {
+    margin: 0 0 10px;
+    color: #ffffff;
+    font-size: 22px;
+}
+
+.conteudo-organizador p {
+    margin-bottom: 18px;
+    color: #c5bac8;
+    line-height: 1.6;
+}
+
+.botao-organizador {
+    display: inline-block;
+    padding: 12px 20px;
+
+    background: #8425c7;
+    color: #ffffff;
+
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+
+    transition: background 0.2s ease;
+}
+
+.botao-organizador:hover {
+    background: #a33be8;
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .area-organizador {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+}
+
+/* =========================================
+   GERENCIAMENTO DE EVENTOS
+========================================= */
+
+.gerenciamento-eventos,
+.formulario-evento {
+    color: var(--cor-texto);
+}
+
+.cabecalho-gerenciamento-eventos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.cabecalho-gerenciamento-eventos h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+}
+
+.cabecalho-gerenciamento-eventos p,
+.mensagem-eventos-vazia {
+    color: var(--cor-texto-secundario);
+}
+
+.gerenciamento-eventos table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.gerenciamento-eventos th,
+.gerenciamento-eventos td {
+    padding: 13px 10px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.acoes-evento {
+    white-space: nowrap;
+}
+
+.acoes-evento a,
+.link-voltar-eventos {
+    color: #dca2ff;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.acoes-evento a:hover,
+.link-voltar-eventos:hover {
+    color: var(--cor-magenta);
+}
+
+.acoes-evento form {
+    display: inline;
+}
+
+.acao-excluir-evento,
+.botao-remover-sessao {
+    padding: 6px 9px;
+    border: 1px solid #a94765;
+    border-radius: 6px;
+    background: transparent;
+    color: #ffb2c2;
+    cursor: pointer;
+}
+
+.mensagem-eventos-vazia {
+    padding: 20px 0;
+}
+
+.formulario-evento {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.formulario-evento .cabecalho-gerenciamento-eventos {
+    margin-bottom: 30px;
+}
+
+.formulario-evento h2 {
+    margin: 28px 0 16px;
+    font-size: 19px;
+    color: #e5c7f7;
+}
+
+.grade-formulario-evento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.campo-evento {
+    min-width: 0;
+    margin-bottom: 14px;
+}
+
+.campo-evento-largo {
+    grid-column: 1 / -1;
+}
+
+.campo-evento label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+}
+
+.campo-evento input:not([type="checkbox"]),
+.campo-evento select,
+.campo-evento textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 7px;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    font: inherit;
+}
+
+.campo-evento input:focus,
+.campo-evento select:focus,
+.campo-evento textarea:focus {
+    outline: 2px solid rgba(132, 37, 199, 0.5);
+    border-color: var(--cor-roxo);
+}
+
+.campo-evento select option {
+    color: #fff;
+    background: var(--cor-superficie-escura);
+}
+
+.campo-evento-check label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 42px;
+}
+
+.linha-sessao-evento {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 9px;
+    background: rgba(8, 5, 34, 0.25);
+}
+
+.botao-secundario-evento {
+    padding: 9px 14px;
+    border: 1px solid var(--cor-roxo);
+    border-radius: 7px;
+    background: transparent;
+    color: #e5c7f7;
+    cursor: pointer;
+}
+
+.acoes-formulario-evento {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 28px;
+}
+
+.acoes-formulario-evento .botao-organizador {
+    border: 0;
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    .cabecalho-gerenciamento-eventos {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tabela-eventos-responsiva {
+        overflow-x: auto;
+    }
+
+    .gerenciamento-eventos table {
+        min-width: 760px;
+    }
+
+    .grade-formulario-evento {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-evento-largo {
+        grid-column: auto;
+    }
+
+    .linha-sessao-evento {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* =========================================
+   ATUALIZAÇÕES E NOTIFICAÇÕES
+========================================= */
+
+.painel-atualizacoes,
+.pagina-notificacoes {
+    color: var(--cor-texto);
+}
+
+.form-publicar-atualizacao {
+    padding: 22px;
+    margin: 22px 0 32px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+    background: rgba(8, 5, 34, 0.25);
+}
+
+.form-publicar-atualizacao h2,
+.lista-atualizacoes-evento > h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+.form-publicar-atualizacao > p {
+    margin-bottom: 18px;
+    color: var(--cor-texto-secundario);
+}
+
+.form-publicar-atualizacao input,
+.form-publicar-atualizacao textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 7px;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    font: inherit;
+}
+
+.form-publicar-atualizacao textarea {
+    resize: vertical;
+}
+
+.form-publicar-atualizacao .botao-organizador {
+    border: 0;
+    cursor: pointer;
+}
+
+.lista-atualizacoes-evento {
+    margin-top: 28px;
+}
+
+.item-atualizacao-evento {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.item-atualizacao-evento small,
+.item-notificacao small {
+    color: var(--cor-texto-secundario);
+}
+
+.item-atualizacao-evento h3 {
+    margin: 8px 0;
+    font-size: 17px;
+}
+
+.item-atualizacao-evento p {
+    line-height: 1.6;
+    color: #eee6f0;
+}
+
+.contador-nao-lidas {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: rgba(132, 37, 199, 0.25);
+    color: #e5c7f7;
+    white-space: nowrap;
+}
+
+.lista-notificacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.item-notificacao {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 10px;
+    background: rgba(8, 5, 34, 0.25);
+}
+
+.item-notificacao.nao-lida {
+    border-left: 4px solid var(--cor-roxo);
+    background: rgba(132, 37, 199, 0.11);
+}
+
+.conteudo-notificacao h2 {
+    margin: 7px 0 5px;
+    font-size: 18px;
+}
+
+.conteudo-notificacao p {
+    margin-top: 10px;
+    line-height: 1.55;
+    color: #eee6f0;
+}
+
+.conteudo-notificacao .evento-da-notificacao {
+    margin-top: 0;
+    color: var(--cor-texto-secundario);
+}
+
+.evento-da-notificacao a {
+    color: #dca2ff;
+    text-decoration: none;
+}
+
+.evento-da-notificacao a:hover {
+    color: var(--cor-magenta);
+}
+
+.item-notificacao form {
+    flex-shrink: 0;
+}
+
+.rotulo-lida {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+@media (max-width: 650px) {
+    .item-notificacao {
+        flex-direction: column;
+        gap: 15px;
+        padding: 16px;
+    }
+
+    .contador-nao-lidas {
+        white-space: normal;
+    }
+}
