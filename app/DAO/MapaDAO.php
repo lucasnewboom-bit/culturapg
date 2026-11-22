@@ -27,6 +27,7 @@ class MapaDAO {
                 e.descricao,
                 e.valor,
                 e.gratuito,
+                e.imagem,
 
                 c.nome AS categoria,
 
@@ -60,6 +61,7 @@ class MapaDAO {
 
             WHERE l.latitude IS NOT NULL
               AND l.longitude IS NOT NULL
+              AND e.status = 'ativo'
         ";
 
         $parametros = [];

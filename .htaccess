@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Keep application source, configuration, database scripts and Git metadata
+# outside the web-accessible surface when the repository root is served.
+RewriteRule ^(?:app|config|database|views|\.git)(?:/|$) - [F,L,NC]
+
+# Do not expose environment or local configuration files.
+<FilesMatch "^(?:\.env(?:\..*)?|database\.local\.php)$">
+    Require all denied
+</FilesMatch>

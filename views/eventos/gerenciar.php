@@ -2,6 +2,14 @@
 function hEvento($valor): string {
     return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
 }
+$imagensEventosGerenciar = [
+    1 => 'corposquefalam1.png',
+    2 => 'sextaas61.png',
+    3 => 'aquelequedizsimaquelequediznao1.png',
+    4 => 'bugiganga1.png',
+    5 => 'sinfoniadasaguas1.png',
+    6 => 'mostradetalentos1.png'
+];
 ?>
 
 <section class="secao-categorias gerenciamento-eventos">
@@ -29,8 +37,24 @@ function hEvento($valor): string {
                 <thead><tr><th>Evento</th><th>Categoria</th><th>Local</th><th>Próxima data</th><th>Status</th><th>Ações</th></tr></thead>
                 <tbody>
                 <?php foreach ($eventos as $item): ?>
+                    <?php
+                    $idEventoItem = (int) $item['id_evento'];
+                    $imagemEventoItem = $item['imagem'] ?? ($imagensEventosGerenciar[$idEventoItem] ?? '');
+                    $caminhoImagemItem = $imagemEventoItem !== '' && strpos($imagemEventoItem, 'img/') === 0
+                        ? $imagemEventoItem
+                        : ($imagemEventoItem !== '' ? 'img/eventos/' . $imagemEventoItem : '');
+                    ?>
                     <tr>
-                        <td><?= hEvento($item['titulo']) ?></td>
+                        <td>
+                            <div class="evento-gerenciar-identificacao">
+                                <?php if ($caminhoImagemItem !== ''): ?>
+                                    <img src="<?= hEvento($caminhoImagemItem) ?>" alt="" loading="lazy">
+                                <?php else: ?>
+                                    <span class="evento-gerenciar-sem-imagem" aria-hidden="true">CPG</span>
+                                <?php endif; ?>
+                                <span><?= hEvento($item['titulo']) ?></span>
+                            </div>
+                        </td>
                         <td><?= hEvento($item['categoria']) ?></td>
                         <td><?= hEvento($item['local']) ?></td>
                         <td><?= !empty($item['proxima_data']) ? hEvento(date('d/m/Y', strtotime($item['proxima_data']))) : 'Sem próximas datas' ?></td>

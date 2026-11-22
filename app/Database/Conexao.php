@@ -33,7 +33,8 @@ class Conexao {
 
         } catch (PDOException $e) {
 
-            die("Erro na conexao: " . $e->getMessage());
+            error_log('Falha de conexao PDO: ' . $e->getMessage());
+            throw new RuntimeException('Não foi possível conectar ao banco de dados.');
 
         }
     }

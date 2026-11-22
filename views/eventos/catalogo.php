@@ -49,7 +49,8 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
     <section class="filtros-catalogo">
 
         <div class="pesquisa-catalogo">
-            <span>⌕</span>
+            <?= iconeCultura('pesquisa') ?>
+
 
             <input
                 type="search"
@@ -98,7 +99,7 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
             id="mostrarFavoritos"
             class="<?= $mostrarFavoritos ? 'ativo' : '' ?>"
         >
-            ♥ Eventos favoritados
+            <?= iconeCultura('coracao') ?> Eventos favoritados
         </button>
 
     </section>
@@ -131,7 +132,7 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
                     <?php
                     $idEvento = (int) $evento['id_evento'];
 
-                    $imagem = $imagensEventos[$idEvento] ?? '';
+                    $imagem = $evento['imagem'] ?? ($imagensEventos[$idEvento] ?? '');
 
                     $data = $evento['proxima_data'] ?? '';
 
@@ -144,8 +145,7 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
                     $favoritado = in_array($idEvento, $favoritos, true);
                     ?>
 
-                    <a
-                        href="index.php?pagina=evento&id=<?= $idEvento ?>"
+                    <article
                         class="card-evento-catalogo"
                         data-titulo="<?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?>"
                         data-categoria="<?= htmlspecialchars($evento['categoria'], ENT_QUOTES, 'UTF-8') ?>"
@@ -153,13 +153,14 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
                         data-data="<?= htmlspecialchars($dataFiltro, ENT_QUOTES, 'UTF-8') ?>"
                         data-favorito="<?= $favoritado ? '1' : '0' ?>"
                     >
+                        <a href="index.php?pagina=evento&id=<?= $idEvento ?>" class="link-card-evento">
 
                         <div class="imagem-card-catalogo">
 
                             <?php if ($imagem !== ''): ?>
 
                                 <img
-                                    src="img/eventos/<?= htmlspecialchars($imagem, ENT_QUOTES, 'UTF-8') ?>"
+                                    src="<?= htmlspecialchars(strpos($imagem, 'img/') === 0 ? $imagem : 'img/eventos/' . $imagem, ENT_QUOTES, 'UTF-8') ?>"
                                     alt="<?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?>"
                                 >
 
@@ -184,11 +185,11 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
                             </h3>
 
                             <p class="data-card-catalogo">
-                                📅 <?= htmlspecialchars($dataFormatada, ENT_QUOTES, 'UTF-8') ?>
+                                <?= iconeCultura('calendario') ?> <?= htmlspecialchars($dataFormatada, ENT_QUOTES, 'UTF-8') ?>
                             </p>
 
                             <p class="local-card-catalogo">
-                                📍 <?= htmlspecialchars($evento['local'], ENT_QUOTES, 'UTF-8') ?>
+                                <?= iconeCultura('pin') ?> <?= htmlspecialchars($evento['local'], ENT_QUOTES, 'UTF-8') ?>
                             </p>
 
                             <div class="rodape-card-catalogo">
@@ -199,13 +200,22 @@ $mostrarFavoritos = ($_GET['filtro'] ?? '') === 'favoritos';
                                         : 'R$ ' . number_format((float) $evento['valor'], 2, ',', '.') ?>
                                 </strong>
 
-                                <span>Ver detalhes →</span>
+                                <span>Ver detalhes <?= iconeCultura('avancar') ?></span>
 
                             </div>
 
                         </div>
 
-                    </a>
+                        </a>
+                        <button
+                            type="button"
+                            class="botao-favorito-catalogo <?= $favoritado ? 'favoritado' : '' ?>"
+                            data-evento="<?= $idEvento ?>"
+                            aria-pressed="<?= $favoritado ? 'true' : 'false' ?>"
+                            aria-label="<?= $favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' ?>"
+                            title="<?= $favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' ?>"
+                        ><?= iconeCultura($favoritado ? 'coracao-preenchido' : 'coracao') ?></button>
+                    </article>
 
                 <?php endforeach; ?>
 
@@ -349,6 +359,45 @@ document.addEventListener('DOMContentLoaded', function () {
         filtrarEventos();
 
         history.replaceState(null, '', 'index.php?pagina=catalogo&filtro=favoritos');
+    });
+
+    document.querySelectorAll('.botao-favorito-catalogo').forEach(function (botao) {
+        botao.addEventListener('click', async function () {
+            botao.disabled = true;
+            try {
+                const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const resposta = await fetch('api/favorito.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-CSRF-Token': token
+                    },
+                    body: new URLSearchParams({ id_evento: botao.dataset.evento })
+                });
+                if (resposta.status === 401) {
+                    window.location.href = 'index.php?pagina=login';
+                    return;
+                }
+                const resultado = await resposta.json();
+                if (!resposta.ok || !resultado.sucesso) {
+                    throw new Error(resultado.mensagem || 'Não foi possível atualizar o favorito.');
+                }
+                const card = botao.closest('.card-evento-catalogo');
+                card.dataset.favorito = resultado.favoritado ? '1' : '0';
+                botao.classList.toggle('favoritado', resultado.favoritado);
+                botao.innerHTML = resultado.favoritado
+                    ? '<?= iconeCultura('coracao-preenchido') ?>'
+                    : '<?= iconeCultura('coracao') ?>';
+                botao.setAttribute('aria-pressed', resultado.favoritado ? 'true' : 'false');
+                botao.setAttribute('aria-label', resultado.favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
+                botao.title = resultado.favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos';
+                filtrarEventos();
+            } catch (erro) {
+                alert(erro.message || 'Não foi possível atualizar o favorito.');
+            } finally {
+                botao.disabled = false;
+            }
+        });
     });
 
     pesquisa.addEventListener('input', filtrarEventos);

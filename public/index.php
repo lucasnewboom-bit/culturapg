@@ -138,6 +138,13 @@ try {
             $acao === 'atualizar' &&
             $_SERVER['REQUEST_METHOD'] === 'POST'
         ) {
+            $tokenCSRFPerfil = (string) ($_POST['csrf_token'] ?? '');
+            if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $tokenCSRFPerfil)) {
+                $_SESSION['mensagem_perfil'] = 'A sessÃ£o expirou. Atualize a pÃ¡gina e tente novamente.';
+                header('Location: index.php?pagina=perfil&acao=editar');
+                exit;
+            }
+
             $resultado = $autenticacaoController->atualizarPerfil(
                 $_POST,
                 $_FILES
@@ -217,12 +224,12 @@ try {
                 }
 
                 if ($acao === 'cadastrar') {
-                    $novoId = $eventoController->cadastrar($idUsuario, $_POST);
+                    $novoId = $eventoController->cadastrar($idUsuario, $_POST, $_FILES['imagem'] ?? null);
                     $_SESSION['mensagem_eventos'] = 'Evento cadastrado com sucesso.';
                     header('Location: index.php?pagina=organizador');
                     exit;
                 } elseif ($acao === 'atualizar' && $idEvento > 0) {
-                    $eventoController->atualizar($idEvento, $idUsuario, $_POST);
+                    $eventoController->atualizar($idEvento, $idUsuario, $_POST, $_FILES['imagem'] ?? null);
                     $_SESSION['mensagem_eventos'] = 'Evento atualizado com sucesso.';
                     header('Location: index.php?pagina=organizador');
                     exit;
@@ -497,12 +504,8 @@ try {
 
 } catch (Throwable $e) {
 
+    error_log($e->getMessage());
     http_response_code(500);
-
-    echo "Erro interno: " . htmlspecialchars(
-        $e->getMessage(),
-        ENT_QUOTES,
-        'UTF-8'
-    );
+    echo "Não foi possível concluir esta solicitação.";
 
 }

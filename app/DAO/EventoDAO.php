@@ -28,6 +28,7 @@ class EventoDAO {
                 e.tipo_contato,
                 e.link_contato,
                 e.classificacao_indicativa,
+                e.imagem,
 
                 c.nome AS categoria,
 
@@ -46,6 +47,7 @@ class EventoDAO {
                 ON e.local_id = l.id_local
 
             WHERE e.id_evento = :id
+              AND e.status = 'ativo'
 
             LIMIT 1
         ";
@@ -177,6 +179,7 @@ class EventoDAO {
 
             WHERE e.local_id = :idLocal
               AND e.id_evento <> :idEventoAtual
+              AND e.status = 'ativo'
 
             ORDER BY d.data_evento, e.titulo
         ";
@@ -204,6 +207,7 @@ class EventoDAO {
                 e.descricao,
                 e.valor,
                 e.gratuito,
+                e.imagem,
 
                 c.nome AS categoria,
 
@@ -266,7 +270,7 @@ class EventoDAO {
 
     public function listarDoUsuario(int $idUsuario): array {
         $sql = "
-            SELECT e.id_evento, e.titulo, e.status, c.nome AS categoria,
+            SELECT e.id_evento, e.titulo, e.imagem, e.status, c.nome AS categoria,
                    l.nome AS local,
                    (SELECT MIN(d.data_evento) FROM DATA_EVENTO d
                     WHERE d.evento_id = e.id_evento AND d.data_evento >= CURDATE()) AS proxima_data
@@ -284,7 +288,7 @@ class EventoDAO {
 
     public function buscarDoUsuario(int $idEvento, int $idUsuario): ?array {
         $sql = "
-            SELECT e.id_evento, e.organizador_id, e.categoria_id, e.local_id,
+            SELECT e.id_evento, e.organizador_id, e.categoria_id, e.local_id, e.imagem,
                    e.titulo, e.descricao, e.valor, e.gratuito, e.tipo_contato,
                    e.link_contato, e.classificacao_indicativa, e.status,
                    l.nome AS local_nome, l.endereco, l.latitude, l.longitude
@@ -331,7 +335,13 @@ class EventoDAO {
             ':endereco' => $dados['endereco']
         ]);
         $idLocal = $stmt->fetchColumn();
-        if ($idLocal) return (int) $idLocal;
+        if ($idLocal) {
+            if ($dados['latitude'] !== '' && $dados['longitude'] !== '') {
+                $stmt = $this->conexao->prepare('UPDATE LOCAL SET latitude = :latitude, longitude = :longitude WHERE id_local = :local AND latitude IS NULL AND longitude IS NULL');
+                $stmt->execute([':latitude' => $dados['latitude'], ':longitude' => $dados['longitude'], ':local' => $idLocal]);
+            }
+            return (int) $idLocal;
+        }
 
         $stmt = $this->conexao->prepare(
             'INSERT INTO LOCAL (cidade_id, nome, endereco, latitude, longitude) VALUES (:cidade, :nome, :endereco, :latitude, :longitude)'
@@ -359,13 +369,15 @@ class EventoDAO {
 
             $stmt = $this->conexao->prepare("UPDATE EVENTO SET categoria_id = :categoria, local_id = :local, titulo = :titulo,
                 descricao = :descricao, valor = :valor, gratuito = :gratuito, tipo_contato = :tipo_contato,
-                link_contato = :link_contato, classificacao_indicativa = :classificacao
+                link_contato = :link_contato, classificacao_indicativa = :classificacao,
+                imagem = COALESCE(:imagem, imagem)
                 WHERE id_evento = :evento AND organizador_id = :organizador");
             $stmt->execute([
                 ':categoria' => $dados['categoria_id'], ':local' => $localId, ':titulo' => $dados['titulo'],
                 ':descricao' => $dados['descricao'] ?: null, ':valor' => $dados['gratuito'] ? 0 : $dados['valor'],
                 ':gratuito' => $dados['gratuito'] ? 1 : 0, ':tipo_contato' => $dados['tipo_contato'] ?: null,
                 ':link_contato' => $dados['link_contato'] ?: null, ':classificacao' => $dados['classificacao_indicativa'] ?: null,
+                ':imagem' => $dados['imagem'] ?? null,
                 ':evento' => $idEvento, ':organizador' => $evento['organizador_id']
             ]);
 
@@ -500,6 +512,11 @@ class EventoDAO {
 
             $localId = $stmt->fetchColumn();
 
+            if ($localId && $dados['latitude'] !== '' && $dados['longitude'] !== '') {
+                $stmt = $this->conexao->prepare('UPDATE LOCAL SET latitude = :latitude, longitude = :longitude WHERE id_local = :local AND latitude IS NULL AND longitude IS NULL');
+                $stmt->execute([':latitude' => $dados['latitude'], ':longitude' => $dados['longitude'], ':local' => $localId]);
+            }
+
             if (!$localId) {
 
                 $sqlCriarLocal = "
@@ -547,7 +564,8 @@ class EventoDAO {
                     gratuito,
                     tipo_contato,
                     link_contato,
-                    classificacao_indicativa
+                    classificacao_indicativa,
+                    imagem
                 ) VALUES (
                     :organizador,
                     :categoria,
@@ -558,7 +576,8 @@ class EventoDAO {
                     :gratuito,
                     :tipo_contato,
                     :link_contato,
-                    :classificacao
+                    :classificacao,
+                    :imagem
                 )
             ";
 
@@ -574,7 +593,8 @@ class EventoDAO {
                 ':gratuito' => $dados['gratuito'] ? 1 : 0,
                 ':tipo_contato' => $dados['tipo_contato'],
                 ':link_contato' => $dados['link_contato'] ?: null,
-                ':classificacao' => $dados['classificacao_indicativa'] ?: null
+                ':classificacao' => $dados['classificacao_indicativa'] ?: null,
+                ':imagem' => $dados['imagem'] ?? null
             ]);
 
             $eventoId = (int) $this->conexao->lastInsertId();

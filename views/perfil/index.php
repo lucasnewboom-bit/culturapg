@@ -99,7 +99,7 @@ $imagensEventos = [
     <div class="area-organizador">
 
         <div class="icone-organizador">
-            📣
+            <?= iconeCultura('usuario-adicionar') ?>
         </div>
 
         <div class="conteudo-organizador">
@@ -142,7 +142,7 @@ $imagensEventos = [
                     <?php
                     $idEvento = (int) $evento['id_evento'];
 
-                    $imagem = $imagensEventos[$idEvento] ?? '';
+                    $imagem = $evento['imagem'] ?? ($imagensEventos[$idEvento] ?? '');
 
                     $data = !empty($evento['data_visualizacao'])
                         ? date('d/m/Y H:i', strtotime($evento['data_visualizacao']))
@@ -157,7 +157,7 @@ $imagensEventos = [
                         <?php if ($imagem !== ''): ?>
 
                             <img
-                                src="img/eventos/<?= htmlspecialchars($imagem, ENT_QUOTES, 'UTF-8') ?>"
+                                src="<?= htmlspecialchars(strpos($imagem, 'img/') === 0 ? $imagem : 'img/eventos/' . $imagem, ENT_QUOTES, 'UTF-8') ?>"
                                 alt="<?= htmlspecialchars($evento['titulo'], ENT_QUOTES, 'UTF-8') ?>"
                             >
 
@@ -179,7 +179,7 @@ $imagensEventos = [
 
                         </div>
 
-                        <span class="seta-historico">›</span>
+                        <span class="seta-historico"><?= iconeCultura('avancar') ?></span>
 
                     </a>
 

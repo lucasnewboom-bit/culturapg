@@ -29,27 +29,27 @@ $imagensEventos = [
     6 => 'mostradetalentos1.png'
 ];
 
-$imagem = $imagensEventos[$idEvento] ?? '';
+$imagem = $evento['imagem'] ?? ($imagensEventos[$idEvento] ?? '');
 
 $imagemCapa = $imagem !== ''
-    ? "img/eventos/" . $imagem
+    ? (strpos($imagem, 'img/') === 0 ? $imagem : "img/eventos/" . $imagem)
     : '';
 
 $configuracaoContato = [
     'whatsapp' => [
         'nome' => 'WhatsApp',
         'classe' => 'botao-contato-whatsapp',
-        'icone' => '💬'
+        'icone' => iconeCultura('whatsapp')
     ],
     'instagram' => [
         'nome' => 'Instagram',
         'classe' => 'botao-contato-instagram',
-        'icone' => '◎'
+        'icone' => iconeCultura('instagram')
     ],
     'sympla' => [
         'nome' => 'Sympla',
         'classe' => 'botao-contato-sympla',
-        'icone' => '🎟'
+        'icone' => iconeCultura('ingresso')
     ]
 ];
 
@@ -57,7 +57,6 @@ $configuracaoContato = [
 
 <a
     href="index.php?pagina=catalogo"
-    class="botao-voltar-evento"
     onclick="
         if (
             document.referrer &&
@@ -68,7 +67,7 @@ $configuracaoContato = [
         }
     "
 >
-    ← Voltar
+    <?= iconeCultura('voltar') ?> Voltar
 </a>
 
 <div class="pagina-evento">
@@ -110,7 +109,7 @@ $configuracaoContato = [
                 class="botao-favorito-evento <?= $favoritado ? 'favoritado' : '' ?>"
                 aria-label="<?= $favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' ?>"
                 title="<?= $favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' ?>"
-            >♥</button>
+            ><?= iconeCultura($favoritado ? 'coracao-preenchido' : 'coracao') ?></button>
         </form>
 
     </div>

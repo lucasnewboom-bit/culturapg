@@ -56,7 +56,7 @@ class HistoricoDAO
     public function listarRecentes(int $idUsuario): array
     {
         $sql = '
-            SELECT e.id_evento, e.titulo, c.nome AS categoria, recentes.data_visualizacao
+            SELECT e.id_evento, e.titulo, e.imagem, c.nome AS categoria, recentes.data_visualizacao
             FROM (
                 SELECT h.usuario_id, h.evento_id, h.data_visualizacao,
                        ROW_NUMBER() OVER (

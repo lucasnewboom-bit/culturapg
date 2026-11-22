@@ -1,7 +1,7 @@
 
 <?php
 
-require_once __DIR__ . '/../DAO/AutenticacaoDAO.php';
+require_once __DIR__ . '/../DAO/AutenticacaoDAO.PHP';
 
 class AutenticacaoController
 {

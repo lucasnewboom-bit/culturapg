@@ -6,6 +6,10 @@
 # Arquivos pessoais enviados por usuários
 /public/img/perfis/*
 !/public/img/perfis/.gitkeep
+!/public/img/perfis/.htaccess
+/public/img/eventos/organizadores/*
+!/public/img/eventos/organizadores/.htaccess
+!/public/img/eventos/organizadores/.gitkeep
 
 # Ferramentas e arquivos locais
 /.idea/

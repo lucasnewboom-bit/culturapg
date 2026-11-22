@@ -33,7 +33,7 @@ $urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEd
     <?php if ($erro !== ''): ?><div class="mensagem-autenticacao" role="alert"><?= hFormularioEvento($erro) ?></div><?php endif; ?>
     <?php if ($mensagem !== ''): ?><div class="mensagem-autenticacao" role="status"><?= hFormularioEvento($mensagem) ?></div><?php endif; ?>
 
-    <form method="post" action="<?= hFormularioEvento($urlFormulario) ?>" class="form-evento" novalidate>
+    <form method="post" enctype="multipart/form-data" action="<?= hFormularioEvento($urlFormulario) ?>" class="form-evento" novalidate>
         <input type="hidden" name="csrf_token" value="<?= hFormularioEvento($csrfEventos) ?>">
 
         <h2>Informações do evento</h2>
@@ -74,7 +74,18 @@ $urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEd
         </div>
 
         <h2>Local</h2>
+        <p class="ajuda-mapa-evento">Clique no mapa para marcar o ponto do evento. Essa localização será usada no mapa interativo.</p>
+        <div id="mapa-selecao-evento" class="mapa-selecao-evento" role="application" aria-label="Mapa para selecionar o local do evento"></div>
         <div class="grade-formulario-evento">
+            <div class="campo-evento campo-evento-largo">
+                <label for="local_predefinido">Local sugerido</label>
+                <select id="local_predefinido">
+                    <option value="">Escolha um local para preencher automaticamente</option>
+                    <option value="opera">Cine Teatro Ópera</option>
+                    <option value="marista">Teatro Marista (Cine Marista - Teatro Marista Pio XII)</option>
+                    <option value="concha">Concha Acústica</option>
+                </select>
+            </div>
             <div class="campo-evento">
                 <label for="local_nome">Nome do local *</label>
                 <input id="local_nome" name="local_nome" maxlength="100" required value="<?= hFormularioEvento($dadosEvento['local_nome'] ?? '') ?>">
@@ -84,13 +95,23 @@ $urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEd
                 <input id="endereco" name="endereco" maxlength="255" required value="<?= hFormularioEvento($dadosEvento['endereco'] ?? '') ?>">
             </div>
             <div class="campo-evento">
-                <label for="latitude">Latitude (opcional)</label>
+                <label for="latitude">Latitude *</label>
                 <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" value="<?= hFormularioEvento($dadosEvento['latitude'] ?? '') ?>">
             </div>
             <div class="campo-evento">
-                <label for="longitude">Longitude (opcional)</label>
+                <label for="longitude">Longitude *</label>
                 <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" value="<?= hFormularioEvento($dadosEvento['longitude'] ?? '') ?>">
             </div>
+        </div>
+
+        <h2>Imagem do evento</h2>
+        <div class="campo-evento campo-evento-imagem">
+            <label for="imagem">Imagem principal (JPG, PNG ou WEBP, até 5 MB)</label>
+            <input id="imagem" name="imagem" type="file" accept="image/jpeg,image/png,image/webp">
+            <?php if (!empty($dadosEvento['imagem'])): ?>
+                <img class="previa-imagem-evento" src="<?= hFormularioEvento($dadosEvento['imagem']) ?>" alt="Imagem atual do evento">
+                <p>Escolha outra imagem para substituir a atual. Se deixar em branco, ela será mantida.</p>
+            <?php endif; ?>
         </div>
 
         <h2>Contato</h2>
@@ -145,6 +166,8 @@ $urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEd
     </form>
 </section>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('sessoes-evento');
@@ -169,5 +192,74 @@ document.addEventListener('DOMContentLoaded', function () {
             if (linhas.length > 1) evento.target.closest('.linha-sessao-evento').remove();
         }
     });
+
+    const mapaEl = document.getElementById('mapa-selecao-evento');
+    const latitude = document.getElementById('latitude');
+    const longitude = document.getElementById('longitude');
+    const localPredefinido = document.getElementById('local_predefinido');
+    const centroPG = [-25.093633, -50.160567];
+    const mapaLocal = L.map(mapaEl).setView(centroPG, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+    }).addTo(mapaLocal);
+    let marcador = null;
+
+    function posicionarMarcador(lat, lng, centralizar) {
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+        if (marcador) marcador.setLatLng([lat, lng]);
+        else marcador = L.marker([lat, lng], { draggable: true }).addTo(mapaLocal);
+        marcador.off('dragend').on('dragend', function (eventoMarcador) {
+            const ponto = eventoMarcador.target.getLatLng();
+            latitude.value = ponto.lat.toFixed(7);
+            longitude.value = ponto.lng.toFixed(7);
+        });
+        latitude.value = lat.toFixed(7);
+        longitude.value = lng.toFixed(7);
+        if (centralizar) mapaLocal.setView([lat, lng], 16);
+    }
+
+    mapaLocal.on('click', function (eventoMapa) {
+        posicionarMarcador(eventoMapa.latlng.lat, eventoMapa.latlng.lng, false);
+    });
+    const locaisPredefinidos = {
+        opera: {
+            nome: 'Cine Teatro Opera',
+            endereco: 'Rua XV de Novembro, 468 - Centro, Ponta Grossa - PR',
+            latitude: -25.0964720,
+            longitude: -50.1601390
+        },
+        marista: {
+            nome: 'Cine Marista - Teatro Marista Pio XII',
+            endereco: 'Rua Rodrigues Alves, 701 - Ponta Grossa - PR',
+            latitude: -25.0825200,
+            longitude: -50.1615400
+        },
+        concha: {
+            nome: 'Concha Acustica',
+            endereco: 'Praca Barao do Rio Branco - Centro, Ponta Grossa - PR',
+            latitude: -25.0936330,
+            longitude: -50.1605670
+        }
+    };
+    localPredefinido.addEventListener('change', function () {
+        const local = locaisPredefinidos[localPredefinido.value];
+        if (!local) return;
+        document.getElementById('local_nome').value = local.nome;
+        document.getElementById('endereco').value = local.endereco;
+        posicionarMarcador(local.latitude, local.longitude, true);
+    });
+    const latInicial = Number(latitude.value);
+    const lngInicial = Number(longitude.value);
+    if (latitude.value !== '' && longitude.value !== '' && Number.isFinite(latInicial) && Number.isFinite(lngInicial)) {
+        posicionarMarcador(latInicial, lngInicial, true);
+    }
+    [latitude, longitude].forEach(function (campo) {
+        campo.addEventListener('change', function () {
+            const lat = Number(latitude.value);
+            const lng = Number(longitude.value);
+            if (latitude.value !== '' && longitude.value !== '') posicionarMarcador(lat, lng, true);
+        });
+    });
+    setTimeout(function () { mapaLocal.invalidateSize(); }, 100);
 });
 </script>

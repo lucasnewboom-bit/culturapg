@@ -94,6 +94,7 @@ CREATE TABLE `evento` (
   `tipo_contato` varchar(30) DEFAULT NULL,
   `link_contato` varchar(500) DEFAULT NULL,
   `classificacao_indicativa` varchar(10) DEFAULT NULL,
+  `imagem` varchar(255) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'ativo',
   PRIMARY KEY (`id_evento`),
   KEY `organizador_id` (`organizador_id`),

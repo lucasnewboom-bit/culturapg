@@ -6,6 +6,10 @@
 
 // 1. INICIALIZAÇÃO DO MAPA
 
+function iconeSprite(nome, classe = '') {
+    return `<svg class="icone-cultura ${classe}" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="img/icones.svg#${nome}"></use></svg>`;
+}
+
 const mapa = L.map('mapa').setView(
     [-25.093633, -50.160567],
     16
@@ -86,9 +90,14 @@ const imagensEventos = {
 
 // Retornar os caminhos das imagens
 
-function obterImagensEvento(id) {
+function obterImagensEvento(evento) {
 
-    const imagens = imagensEventos[id];
+    if (evento && typeof evento.imagem === 'string' && evento.imagem !== '') {
+        const imagem = new URL(evento.imagem, document.baseURI).href;
+        return { principal: imagem, popup: imagem };
+    }
+
+    const imagens = imagensEventos[evento.id_evento];
 
     if (!imagens) {
         return {
@@ -124,81 +133,12 @@ function normalizarCategoria(nome) {
 
 // 6. DESENHAR OS SÍMBOLOS DOS PINS EM SVG
 
-function desenharSimbolo(categoria) {
-
-    if (categoria === 'musica') {
-
-        return `
-            <path d="M54 25 V48
-                     C54 54 43 56 41 50
-                     C39 44 49 41 54 43
-                     V20 L73 15 V39
-                     C73 45 62 47 60 41
-                     C58 35 68 32 73 34
-                     V10 L54 15 Z"
-                  fill="#090909"
-                  transform="translate(-7 0) scale(0.85)"/>
-        `;
-    }
-
-    if (categoria === 'teatro') {
-
-        return `
-            <g fill="#090909">
-                <path d="M25 28 Q18 23 20 39
-                         Q22 54 36 52
-                         Q46 49 46 35
-                         Q36 39 25 28 Z"/>
-                <path d="M29 39 Q33 44 37 39"
-                      fill="none" stroke="#d414b8"
-                      stroke-width="2.5"/>
-                <path d="M53 27 Q60 20 72 28
-                         Q82 38 74 51
-                         Q64 61 53 50
-                         Q48 40 53 27 Z"/>
-                <path d="M57 42 Q64 34 71 42"
-                      fill="none" stroke="#d414b8"
-                      stroke-width="2.5"/>
-                <circle cx="33" cy="34" r="2"/>
-                <circle cx="64" cy="34" r="2"/>
-            </g>
-        `;
-    }
-
-    if (categoria === 'danca') {
-
-        return `
-            <g fill="#090909" stroke="#090909"
-               stroke-linecap="round" stroke-linejoin="round">
-
-                <circle cx="38" cy="17" r="5"/>
-                <circle cx="61" cy="13" r="5"/>
-
-                <path d="M38 24 L48 34 L42 43"
-                      fill="none" stroke-width="5"/>
-                <path d="M61 20 L53 30 L65 37"
-                      fill="none" stroke-width="5"/>
-
-                <path d="M47 33 L31 29 L21 36"
-                      fill="none" stroke-width="4"/>
-                <path d="M53 30 L69 24 L78 29"
-                      fill="none" stroke-width="4"/>
-
-                <path d="M42 42 L32 49 L22 52"
-                      fill="none" stroke-width="4"/>
-                <path d="M65 37 L74 44 L83 46"
-                      fill="none" stroke-width="4"/>
-
-                <path d="M45 37 L35 57 L76 57 L59 37 Z"/>
-            </g>
-        `;
-    }
-
-    return '';
+function desenharSimbolo(categoria, x = 12, y = 12, tamanho = 24) {
+    const simbolos = { musica: 'musica', teatro: 'teatro', danca: 'danca' };
+    const icone = simbolos[categoria];
+    if (!icone) return '';
+    return `<svg x="${x}" y="${y}" width="${tamanho}" height="${tamanho}" viewBox="0 0 24 24" style="color:#090909" aria-hidden="true"><use href="img/icones.svg#${icone}"></use></svg>`;
 }
-
-
-// 7. CRIAR O PIN PERSONALIZADO
 
 function criarIcone(eventosDoLocal) {
 
@@ -277,11 +217,7 @@ function criarIcone(eventosDoLocal) {
 
         categoriasDoLocal.forEach((categoria, i) => {
 
-            simbolos += `
-                <g transform="translate(${centros[i] - 12}, 18) scale(0.35)">
-                    ${desenharSimbolo(categoria)}
-                </g>
-            `;
+            simbolos += desenharSimbolo(categoria, centros[i] - 7, 16, 14);
         });
     }
 
@@ -331,30 +267,52 @@ function criarIcone(eventosDoLocal) {
 
 function agruparPorLocal(eventos) {
 
-    const locais = {};
+    const locais = [];
+
+    function normalizarNomeLocal(nome) {
+        return String(nome || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '');
+    }
+
+    function distanciaMetros(lat1, lng1, lat2, lng2) {
+        const radianos = valor => valor * Math.PI / 180;
+        const diferencaLat = radianos(lat2 - lat1);
+        const diferencaLng = radianos(lng2 - lng1);
+        const a = Math.sin(diferencaLat / 2) ** 2 +
+            Math.cos(radianos(lat1)) * Math.cos(radianos(lat2)) *
+            Math.sin(diferencaLng / 2) ** 2;
+        return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
 
     eventos.forEach(evento => {
+        const latitude = Number(evento.latitude);
+        const longitude = Number(evento.longitude);
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
 
-        const chave = [
-            evento.local,
-            evento.latitude,
-            evento.longitude
-        ].join('|');
+        const nomeNormalizado = normalizarNomeLocal(evento.local);
+        let local = locais.find(item =>
+            item.nomeNormalizado === nomeNormalizado &&
+            distanciaMetros(item.latitude, item.longitude, latitude, longitude) <= 40
+        );
 
-        if (!locais[chave]) {
-
-            locais[chave] = {
+        if (!local) {
+            local = {
                 nome: evento.local,
-                latitude: Number(evento.latitude),
-                longitude: Number(evento.longitude),
+                nomeNormalizado,
+                latitude,
+                longitude,
                 eventos: []
             };
+            locais.push(local);
         }
 
-        locais[chave].eventos.push(evento);
+        local.eventos.push(evento);
     });
 
-    return Object.values(locais);
+    return locais;
 }
 
 
@@ -385,7 +343,7 @@ function criarPopup(local) {
             ? categorias[categoria].nome
             : evento.categoria;
 
-        const imagens = obterImagensEvento(evento.id_evento);
+        const imagens = obterImagensEvento(evento);
 
         const sessoes = evento.sessoes
             ? evento.sessoes.split('||')
@@ -394,7 +352,7 @@ function criarPopup(local) {
         const listaSessoes = sessoes.length > 0
             ? sessoes.map(sessao => `
                 <div class="sessao-popup">
-                    <span>📅 ${escaparHTML(sessao)}</span>
+                    <span>${iconeSprite('calendario')} ${escaparHTML(sessao)}</span>
                 </div>
             `).join('')
             : '<p class="sem-sessoes">Nenhuma sessão cadastrada.</p>';
@@ -414,7 +372,7 @@ function criarPopup(local) {
                     <span
                         class="coracao-favorito-popup ${evento.favoritado ? 'favoritado' : ''}"
                         title="${evento.favoritado ? 'Evento favoritado' : 'Evento não favoritado'}"
-                    >♥</span>
+                    >${iconeSprite(evento.favoritado ? 'coracao-preenchido' : 'coracao')}</span>
 
                 </div>
                 <span class="evento-categoria">
@@ -466,7 +424,8 @@ async function carregarEventos() {
         });
 
         const resposta = await fetch(
-            `api/eventos.php?${parametros.toString()}`
+            `api/eventos.php?${parametros.toString()}`,
+            { cache: 'no-store' }
         );
 
         if (!resposta.ok) {
@@ -549,16 +508,9 @@ let atualizarCalendarioAtual = null;
 // Símbolo de cada categoria
 
 function simboloCategoria(categoria) {
-
     const chave = normalizarCategoria(categoria);
-
-    const simbolos = {
-        musica: '♪',
-        teatro: '🎭',
-        danca: '💃'
-    };
-
-    return simbolos[chave] || '●';
+    const simbolos = { musica: 'musica', teatro: 'teatro', danca: 'danca' };
+    return iconeSprite(simbolos[chave] || 'lista');
 }
 
 
@@ -776,62 +728,10 @@ function criarBotoesContato(links) {
     }
 
     const configuracao = {
-
-        whatsapp: {
-            nome: 'WhatsApp',
-            classe: 'botao-contato-whatsapp',
-            icone: `
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20l1.1-5.4A8.4 8.4 0 1 1 21 11.5Z"/>
-                    <path d="M9 9a5 5 0 0 0 6 6"/>
-                </svg>
-            `
-        },
-
-        instagram: {
-            nome: 'Instagram',
-            classe: 'botao-contato-instagram',
-            icone: `
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="3" width="18" height="18" rx="5"/>
-                    <circle cx="12" cy="12" r="4"/>
-                    <circle cx="17.5" cy="6.5" r="1"/>
-                </svg>
-            `
-        },
-
-        sympla: {
-            nome: 'Sympla',
-            classe: 'botao-contato-sympla',
-            icone: `
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 7V4h16v3"/>
-                    <path d="M4 17v3h16v-3"/>
-                    <path d="M4 7a2 2 0 0 1 0 4v2a2 2 0 0 1 0 4"/>
-                    <path d="M20 7a2 2 0 0 0 0 4v2a2 2 0 0 0 0 4"/>
-                    <path d="M12 8v8"/>
-                </svg>
-            `
-        }
-
+        whatsapp: { nome: 'WhatsApp', classe: 'botao-contato-whatsapp', icone: iconeSprite('whatsapp') },
+        instagram: { nome: 'Instagram', classe: 'botao-contato-instagram', icone: iconeSprite('instagram') },
+        sympla: { nome: 'Sympla', classe: 'botao-contato-sympla', icone: iconeSprite('ingresso') }
     };
-
     const botoes = links.map(tipo => {
 
         const item = configuracao[tipo];
@@ -897,7 +797,7 @@ async function abrirModalEvento(id) {
 
         const eventosMesmoLocal = evento.eventos_mesmo_local || [];
 
-        const imagens = obterImagensEvento(evento.id_evento);
+        const imagens = obterImagensEvento(evento);
 
         const ingresso = Number(evento.gratuito)
             ? 'Entrada gratuita'
@@ -925,12 +825,9 @@ async function abrirModalEvento(id) {
                         id="botaoFavoritoModal"
                         title="${evento.favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}"
                         aria-label="${evento.favoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}"
+                        aria-pressed="${evento.favoritado ? 'true' : 'false'}"
                         onclick="alternarFavoritoModal(${Number(evento.id_evento)})"
-                    >
-                        ♥
-                    </button>
-
-                    <h1>${escaparHTML(evento.titulo)}</h1>
+                    >${iconeSprite(evento.favoritado ? 'coracao-preenchido' : 'coracao')}</button>
 
                 </div>
 
@@ -973,7 +870,7 @@ async function abrirModalEvento(id) {
 
                             ${Number(evento.gratuito) === 0 ? `
                                 <span class="ingressos-disponiveis-modal">
-                                    ● DISPONÍVEIS
+                                    ${iconeSprite('confirmar')} DISPONÍVEIS
                                 </span>
                             ` : ''}
                         </div>
@@ -1255,10 +1152,13 @@ async function alternarFavoritoModal(idEvento) {
         // Atualiza a aparência do coração
 
         botao.classList.toggle('favoritado', resultado.favoritado);
+        botao.innerHTML = iconeSprite(resultado.favoritado ? 'coracao-preenchido' : 'coracao');
 
         botao.title = resultado.favoritado
             ? 'Remover dos favoritos'
             : 'Adicionar aos favoritos';
+
+        botao.setAttribute('aria-pressed', resultado.favoritado ? 'true' : 'false');
 
         botao.setAttribute(
             'aria-label',

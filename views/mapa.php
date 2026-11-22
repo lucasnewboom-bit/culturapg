@@ -76,5 +76,5 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <!-- Nosso mapa -->
-<script src="js/mapa.js"></script>
+<script src="js/mapa.js?v=20261122-1"></script>
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>

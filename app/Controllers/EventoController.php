@@ -1,14 +1,17 @@
 <?php
 
 require_once __DIR__ . '/../DAO/EventoDAO.php';
+require_once __DIR__ . '/../Services/ImagemEventoService.php';
 
 class EventoController
 {
     private EventoDAO $eventoDAO;
+    private ImagemEventoService $imagemEventoService;
 
     public function __construct()
     {
         $this->eventoDAO = new EventoDAO();
+        $this->imagemEventoService = new ImagemEventoService();
     }
 
     public function listar(int $idUsuario): array
@@ -31,14 +34,42 @@ class EventoController
         return $this->eventoDAO->listarCategorias();
     }
 
-    public function cadastrar(int $idUsuario, array $entrada): int
+    public function cadastrar(int $idUsuario, array $entrada, ?array $arquivoImagem = null): int
     {
-        return $this->eventoDAO->cadastrar($idUsuario, $this->validar($entrada, $idUsuario));
+        $dados = $this->validar($entrada, $idUsuario);
+        $imagemNova = $this->imagemEventoService->salvarUpload($arquivoImagem);
+        $dados['imagem'] = $imagemNova;
+        try {
+            return $this->eventoDAO->cadastrar($idUsuario, $dados);
+        } catch (Throwable $e) {
+            $this->imagemEventoService->remover($imagemNova);
+            throw $e;
+        }
     }
 
-    public function atualizar(int $idEvento, int $idUsuario, array $entrada): bool
+    public function atualizar(int $idEvento, int $idUsuario, array $entrada, ?array $arquivoImagem = null): bool
     {
-        return $this->eventoDAO->atualizar($idEvento, $idUsuario, $this->validar($entrada, $idUsuario));
+        $eventoAtual = $this->eventoDAO->buscarDoUsuario($idEvento, $idUsuario);
+        if (!$eventoAtual) {
+            throw new RuntimeException('Evento não encontrado ou sem permissão para editá-lo.');
+        }
+        $dados = $this->validar($entrada, $idUsuario);
+        $imagemNova = $this->imagemEventoService->salvarUpload($arquivoImagem);
+        $dados['imagem'] = $imagemNova;
+        try {
+            $salvou = $this->eventoDAO->atualizar($idEvento, $idUsuario, $dados);
+            if (!$salvou) {
+                $this->imagemEventoService->remover($imagemNova);
+                return false;
+            }
+            if ($salvou && $imagemNova) {
+                $this->imagemEventoService->remover($eventoAtual['imagem'] ?? null);
+            }
+            return $salvou;
+        } catch (Throwable $e) {
+            $this->imagemEventoService->remover($imagemNova);
+            throw $e;
+        }
     }
 
     public function excluir(int $idEvento, int $idUsuario): bool
@@ -97,6 +128,9 @@ class EventoController
         $longitude = trim((string) ($entrada['longitude'] ?? ''));
         if (($latitude === '') !== ($longitude === '')) {
             throw new InvalidArgumentException('Preencha latitude e longitude juntas ou deixe as duas vazias.');
+        }
+        if ($latitude === '' || $longitude === '') {
+            throw new InvalidArgumentException('Marque a localização do evento no mapa para que ele apareça no mapa interativo.');
         }
         if ($latitude !== '' && (!is_numeric($latitude) || (float) $latitude < -90 || (float) $latitude > 90 || !is_numeric($longitude) || (float) $longitude < -180 || (float) $longitude > 180)) {
             throw new InvalidArgumentException('As coordenadas geográficas são inválidas.');
