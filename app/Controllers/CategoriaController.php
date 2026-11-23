@@ -17,25 +17,47 @@ class CategoriaController {
         return $this->categoriaDAO->listar();
     }
 
+    public function listarCriadasPor(int $idUsuario): array {
+        return $this->categoriaDAO->listarCriadasPor($idUsuario);
+    }
+
     // READ - Buscar categoria
     public function buscar(int $id): ?Categoria {
         return $this->categoriaDAO->buscarPorId($id);
     }
 
     // CREATE - Cadastrar categoria
-    public function cadastrar(string $nome): int {
+    public function cadastrar(string $nome, int $idUsuarioCriador): int {
 
         $nome = trim($nome);
 
-        if (empty($nome)) {
+        if ($nome === '') {
             throw new InvalidArgumentException(
                 "O nome da categoria é obrigatório."
             );
         }
 
+        if (mb_strlen($nome) > 50) {
+            throw new InvalidArgumentException(
+                "O nome da categoria deve ter no máximo 50 caracteres."
+            );
+        }
+
+        if ($idUsuarioCriador <= 0) {
+            throw new InvalidArgumentException("É necessário entrar na sua conta para criar uma categoria.");
+        }
+
         $categoria = new Categoria($nome);
 
-        return $this->categoriaDAO->inserir($categoria);
+        return $this->categoriaDAO->inserir($categoria, $idUsuarioCriador);
+    }
+
+    public function excluir(int $idCategoria, int $idUsuario): bool {
+        if ($idCategoria <= 0 || $idUsuario <= 0) {
+            throw new InvalidArgumentException("Categoria ou usuário inválido.");
+        }
+
+        return $this->categoriaDAO->excluirCriadaPor($idCategoria, $idUsuario);
     }
 
     // UPDATE - Atualizar categoria
@@ -61,15 +83,4 @@ class CategoriaController {
         );
     }
 
-    // DELETE - Excluir categoria
-    public function excluir(int $id): bool {
-
-        if ($id <= 0) {
-            throw new InvalidArgumentException(
-                "ID de categoria inválido."
-            );
-        }
-
-        return $this->categoriaDAO->excluir($id);
-    }
 }

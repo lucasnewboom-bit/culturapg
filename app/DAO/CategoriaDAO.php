@@ -14,16 +14,17 @@ class CategoriaDAO {
     }
 
     // CREATE - Cadastrar categoria
-    public function inserir(Categoria $categoria): int {
+    public function inserir(Categoria $categoria, int $idUsuarioCriador): int {
 
-        $sql = "INSERT INTO CATEGORIA (nome, ativo)
-                VALUES (:nome, :ativo)";
+        $sql = "INSERT INTO CATEGORIA (nome, ativo, criado_por_usuario_id)
+                VALUES (:nome, :ativo, :criador)";
 
         $stmt = $this->conexao->prepare($sql);
 
         $stmt->execute([
             ':nome' => $categoria->getNome(),
-            ':ativo' => $categoria->getAtivo()
+            ':ativo' => $categoria->getAtivo(),
+            ':criador' => $idUsuarioCriador
         ]);
 
         return (int) $this->conexao->lastInsertId();
@@ -48,6 +49,48 @@ class CategoriaDAO {
         }
 
         return $categorias;
+    }
+
+    // Lista somente as categorias ativas criadas pelo usuário autenticado.
+    public function listarCriadasPor(int $idUsuario): array {
+
+        $sql = "SELECT nome, ativo, id_categoria
+                FROM CATEGORIA
+                WHERE criado_por_usuario_id = :usuario
+                  AND ativo = 1
+                ORDER BY nome";
+
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([':usuario' => $idUsuario]);
+
+        $categorias = [];
+        while ($dados = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $categorias[] = new Categoria(
+                $dados['nome'],
+                (bool) $dados['ativo'],
+                (int) $dados['id_categoria']
+            );
+        }
+
+        return $categorias;
+    }
+
+    // A desativação mantém intactos os eventos que já usam a categoria.
+    public function excluirCriadaPor(int $idCategoria, int $idUsuario): bool {
+
+        $sql = "UPDATE CATEGORIA
+                SET ativo = 0
+                WHERE id_categoria = :categoria
+                  AND criado_por_usuario_id = :usuario
+                  AND ativo = 1";
+
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([
+            ':categoria' => $idCategoria,
+            ':usuario' => $idUsuario
+        ]);
+
+        return $stmt->rowCount() === 1;
     }
 
     // READ - Buscar categoria por ID
@@ -95,16 +138,4 @@ class CategoriaDAO {
         ]);
     }
 
-    // DELETE - Excluir categoria
-    public function excluir(int $id): bool {
-
-        $sql = "DELETE FROM CATEGORIA
-                WHERE id_categoria = :id";
-
-        $stmt = $this->conexao->prepare($sql);
-
-        return $stmt->execute([
-            ':id' => $id
-        ]);
-    }
 }

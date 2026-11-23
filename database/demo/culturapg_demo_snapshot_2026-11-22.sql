@@ -52,6 +52,7 @@ DROP TABLE IF EXISTS `categoria`;
 CREATE TABLE `categoria` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(50) NOT NULL,
+  `criado_por_usuario_id` int DEFAULT NULL,
   `ativo` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_categoria`),
   UNIQUE KEY `nome` (`nome`)
@@ -336,3 +337,7 @@ INSERT INTO `usuario` (`id_usuario`, `nome`, `username`, `status`, `foto_perfil`
 ('10', 'Visitante Demonstração', 'demo_visit_20261122', 'ativo', NULL);
 
 SET FOREIGN_KEY_CHECKS=1;
+ALTER TABLE `categoria`
+  ADD KEY `idx_categoria_criado_por_usuario` (`criado_por_usuario_id`),
+  ADD CONSTRAINT `fk_categoria_criador_usuario`
+    FOREIGN KEY (`criado_por_usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL;

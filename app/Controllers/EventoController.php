@@ -29,9 +29,9 @@ class EventoController
         return $this->eventoDAO->buscarDoUsuario($idEvento, $idUsuario);
     }
 
-    public function categorias(): array
+    public function categorias(?int $categoriaAtualId = null): array
     {
-        return $this->eventoDAO->listarCategorias();
+        return $this->eventoDAO->listarCategorias($categoriaAtualId);
     }
 
     public function cadastrar(int $idUsuario, array $entrada, ?array $arquivoImagem = null): int
@@ -53,7 +53,7 @@ class EventoController
         if (!$eventoAtual) {
             throw new RuntimeException('Evento não encontrado ou sem permissão para editá-lo.');
         }
-        $dados = $this->validar($entrada, $idUsuario);
+        $dados = $this->validar($entrada, $idUsuario, [(int) $eventoAtual['categoria_id']]);
         $imagemNova = $this->imagemEventoService->salvarUpload($arquivoImagem);
         $dados['imagem'] = $imagemNova;
         try {
@@ -77,7 +77,7 @@ class EventoController
         return $this->eventoDAO->excluirLogicamente($idEvento, $idUsuario);
     }
 
-    private function validar(array $entrada, int $idUsuario): array
+    private function validar(array $entrada, int $idUsuario, array $categoriasInativasPermitidas = []): array
     {
         $titulo = trim((string) ($entrada['titulo'] ?? ''));
         $local = trim((string) ($entrada['local_nome'] ?? ''));
@@ -90,7 +90,9 @@ class EventoController
         if ($local === '' || mb_strlen($local) > 100 || $endereco === '' || mb_strlen($endereco) > 255) {
             throw new InvalidArgumentException('Informe o nome do local (até 100 caracteres) e o endereço (até 255 caracteres).');
         }
-        if (!$categoriaId || !in_array((int) $categoriaId, array_map('intval', array_column($this->categorias(), 'id_categoria')), true)) {
+        $categoriasAtivas = array_map('intval', array_column($this->categorias(), 'id_categoria'));
+        $categoriasPermitidas = array_merge($categoriasAtivas, array_map('intval', $categoriasInativasPermitidas));
+        if (!$categoriaId || !in_array((int) $categoriaId, $categoriasPermitidas, true)) {
             throw new InvalidArgumentException('Selecione uma categoria ativa.');
         }
 

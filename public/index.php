@@ -283,6 +283,8 @@ try {
                 if (!$evento) {
                     http_response_code(404);
                     echo 'Evento não encontrado ou você não tem permissão para acessá-lo.';
+                    } else {
+                        $categorias = $eventoController->categorias((int) $evento['categoria_id']);
                 }
             }
 
@@ -389,6 +391,87 @@ try {
                 $categorias = $categoriaController->listar();
 
                 require_once __DIR__ . '/../views/categorias/listar.php';
+
+                break;
+
+            case 'cadastrar':
+
+                if (!isset($_SESSION['usuario']['id'])) {
+                    header('Location: index.php?pagina=login');
+                    exit;
+                }
+
+                $idUsuarioCategoria = (int) $_SESSION['usuario']['id'];
+                $erroCategoria = '';
+                $mensagemCategoria = $_SESSION['mensagem_categorias'] ?? '';
+                unset($_SESSION['mensagem_categorias']);
+                $nomeCategoria = trim((string) ($_POST['nome'] ?? ''));
+                $origemCategoria = (($_POST['origem'] ?? $_GET['origem'] ?? '') === 'evento')
+                    ? 'evento'
+                    : 'lista';
+                $categoriaCriada = null;
+                $categoriaExcluidaId = (int) ($_SESSION['categoria_excluida_id'] ?? 0);
+                unset($_SESSION['categoria_excluida_id']);
+
+                if (isset($_GET['categoria_criada'])) {
+                    $idCategoriaCriada = filter_var($_GET['categoria_criada'], FILTER_VALIDATE_INT);
+                    if ($idCategoriaCriada) {
+                        $categoriaCriada = $categoriaController->buscar((int) $idCategoriaCriada);
+                    }
+                }
+
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $tokenCategoria = (string) ($_POST['csrf_token'] ?? '');
+
+                    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $tokenCategoria)) {
+                        $erroCategoria = 'A sessão expirou. Atualize a página e tente novamente.';
+                    } elseif (($_POST['operacao'] ?? 'cadastrar') === 'excluir') {
+                        $idCategoriaExcluir = filter_var($_POST['id_categoria'] ?? null, FILTER_VALIDATE_INT);
+
+                        try {
+                            if ($idCategoriaExcluir && $categoriaController->excluir((int) $idCategoriaExcluir, $idUsuarioCategoria)) {
+                                $_SESSION['mensagem_categorias'] = 'Sua categoria foi removida. Os eventos já cadastrados foram preservados.';
+                                $_SESSION['categoria_excluida_id'] = (int) $idCategoriaExcluir;
+                            } else {
+                                $_SESSION['mensagem_categorias'] = 'Essa categoria não existe, já foi removida ou não foi criada pela sua conta.';
+                            }
+                        } catch (Throwable $e) {
+                            error_log($e->getMessage());
+                            $_SESSION['mensagem_categorias'] = 'Não foi possível remover a categoria. Tente novamente.';
+                        }
+
+                        header('Location: index.php?pagina=categorias&acao=cadastrar' . ($origemCategoria === 'evento' ? '&origem=evento' : ''));
+                        exit;
+                    } else {
+                        try {
+                            $idNovaCategoria = $categoriaController->cadastrar($nomeCategoria, $idUsuarioCategoria);
+
+                            if ($origemCategoria === 'evento') {
+                                header('Location: index.php?pagina=categorias&acao=cadastrar&origem=evento&categoria_criada=' . $idNovaCategoria);
+                            } else {
+                                $_SESSION['mensagem_categorias'] = 'Categoria cadastrada com sucesso.';
+                                header('Location: index.php?pagina=categorias&acao=listar');
+                            }
+
+                            exit;
+                        } catch (InvalidArgumentException $e) {
+                            $erroCategoria = $e->getMessage();
+                        } catch (PDOException $e) {
+                            if ($e->getCode() === '23000') {
+                                $erroCategoria = 'Já existe uma categoria com esse nome.';
+                            } else {
+                                error_log($e->getMessage());
+                                $erroCategoria = 'Não foi possível salvar a categoria. Tente novamente.';
+                            }
+                        }
+                    }
+                }
+
+                $categoriasCriadas = $categoriaController->listarCriadasPor($idUsuarioCategoria);
+
+                require_once __DIR__ . '/../views/layouts/header.php';
+                require_once __DIR__ . '/../views/categorias/cadastrar.php';
+                require_once __DIR__ . '/../views/layouts/footer.php';
 
                 break;
 

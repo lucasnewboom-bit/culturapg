@@ -4,14 +4,6 @@ USE `culturapg`;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
-CREATE TABLE `categoria` (
-  `id_categoria` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(50) NOT NULL,
-  `ativo` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id_categoria`),
-  UNIQUE KEY `nome` (`nome`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE `cidade` (
   `id_cidade` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) NOT NULL,
@@ -66,6 +58,17 @@ CREATE TABLE `cadastro` (
   UNIQUE KEY `usuario_id` (`usuario_id`),
   UNIQUE KEY `email` (`email`),
   CONSTRAINT `cadastro_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `categoria` (
+  `id_categoria` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(50) NOT NULL,
+  `criado_por_usuario_id` int DEFAULT NULL,
+  `ativo` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_categoria`),
+  UNIQUE KEY `nome` (`nome`),
+  KEY `idx_categoria_criado_por_usuario` (`criado_por_usuario_id`),
+  CONSTRAINT `fk_categoria_criador_usuario` FOREIGN KEY (`criado_por_usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `organizador` (

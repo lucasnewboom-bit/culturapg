@@ -72,7 +72,7 @@ $sql .= 'INSERT IGNORE INTO `CIDADE` (`id_cidade`, `nome`, `estado`, `uf`) VALUE
     . $conexao->quote($cidade['uf']) . ");\n\n";
 
 $categorias = $conexao->query(
-    'SELECT id_categoria, nome, ativo FROM CATEGORIA ORDER BY id_categoria'
+    'SELECT id_categoria, nome, ativo FROM CATEGORIA WHERE id_categoria IN (1, 2, 3) AND criado_por_usuario_id IS NULL ORDER BY id_categoria'
 )->fetchAll(PDO::FETCH_ASSOC);
 
 $sql .= "-- Categorias disponíveis no catálogo.\n";

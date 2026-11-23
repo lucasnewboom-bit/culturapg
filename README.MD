@@ -23,6 +23,8 @@ Plataforma de divulgação de eventos culturais de Ponta Grossa - PR, desenvolvi
 5. Inicie o Apache no XAMPP e o MySQL Server 8.0.
 6. Abra `http://localhost/culturapg/public/`.
 
+Se você restaurou um banco salvo antes da atualização de categorias, execute uma vez o arquivo `database/migrations/20261123_add_categoria_owner.sql` no schema configurado em `config/database.local.php`.
+
 `config/database.local.php` e as fotos de perfil ficam fora do Git para proteger credenciais e arquivos pessoais. A pasta de fotos é criada para receber uploads quando o sistema for usado.
 
 ## Atualizações do código

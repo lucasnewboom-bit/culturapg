@@ -47,9 +47,15 @@ $urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEd
                 <select id="categoria_id" name="categoria_id" required>
                     <option value="">Selecione</option>
                     <?php foreach ($categorias as $categoria): ?>
-                        <option value="<?= (int) $categoria['id_categoria'] ?>" <?= (string) ($dadosEvento['categoria_id'] ?? '') === (string) $categoria['id_categoria'] ? 'selected' : '' ?>><?= hFormularioEvento($categoria['nome']) ?></option>
+                        <option value="<?= (int) $categoria['id_categoria'] ?>" <?= (string) ($dadosEvento['categoria_id'] ?? '') === (string) $categoria['id_categoria'] ? 'selected' : '' ?>><?= hFormularioEvento($categoria['nome']) ?><?= empty($categoria['ativo']) ? ' (indisponível para novos eventos)' : '' ?></option>
                     <?php endforeach; ?>
                 </select>
+                <a
+                    class="botao-secundario-evento botao-criar-categoria-evento"
+                    href="index.php?pagina=categorias&amp;acao=cadastrar&amp;origem=evento"
+                    target="_blank"
+                    rel="opener"
+                >Não encontrou uma categoria? Crie a sua para esse evento</a>
             </div>
             <div class="campo-evento">
                 <label for="classificacao_indicativa">Classificação indicativa</label>
@@ -169,6 +175,42 @@ $urlFormulario = 'index.php?pagina=organizador&acao=' . $acaoFormulario . ($emEd
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+window.addEventListener('message', function (eventoMensagem) {
+    if (eventoMensagem.origin !== window.location.origin) return;
+
+    const dados = eventoMensagem.data;
+    if (!dados || !dados.categoria) return;
+
+    const seletorCategoria = document.getElementById('categoria_id');
+    const idCategoria = String(dados.categoria.id || '');
+    if (!seletorCategoria || !idCategoria) return;
+
+    if (dados.tipo === 'culturapg_categoria_excluida') {
+        const opcaoRemovida = Array.from(seletorCategoria.options).find(function (item) {
+            return item.value === idCategoria;
+        });
+        if (opcaoRemovida) opcaoRemovida.remove();
+        if (seletorCategoria.value === idCategoria) seletorCategoria.value = '';
+        return;
+    }
+
+    if (dados.tipo !== 'culturapg_categoria_criada') return;
+
+    let opcao = Array.from(seletorCategoria.options).find(function (item) {
+        return item.value === idCategoria;
+    });
+
+    if (!opcao) {
+        opcao = document.createElement('option');
+        opcao.value = idCategoria;
+        opcao.textContent = String(dados.categoria.nome || 'Nova categoria');
+        seletorCategoria.add(opcao);
+    }
+
+    seletorCategoria.value = idCategoria;
+    seletorCategoria.dispatchEvent(new Event('change', { bubbles: true }));
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('sessoes-evento');
     const botao = document.getElementById('adicionar-sessao-evento');

@@ -2906,6 +2906,13 @@ body:has(.pagina-mapa) .rodape {
     cursor: pointer;
 }
 
+.botao-criar-categoria-evento {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 9px;
+    text-decoration: none;
+}
+
 .acoes-formulario-evento {
     display: flex;
     align-items: center;

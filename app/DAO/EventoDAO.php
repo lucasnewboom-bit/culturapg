@@ -245,17 +245,17 @@ class EventoDAO {
     // LISTAR CATEGORIAS ATIVAS
     // ============================================
 
-    public function listarCategorias(): array {
+    public function listarCategorias(?int $categoriaAtualId = null): array {
 
         $sql = "
-            SELECT id_categoria, nome
+            SELECT id_categoria, nome, ativo
             FROM CATEGORIA
-            WHERE ativo = 1
+            WHERE ativo = 1 OR id_categoria = :categoria_atual
             ORDER BY nome
         ";
 
         $stmt = $this->conexao->prepare($sql);
-        $stmt->execute();
+        $stmt->execute([':categoria_atual' => (int) $categoriaAtualId]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -363,8 +363,11 @@ class EventoDAO {
             if (!$evento) throw new RuntimeException('Evento não encontrado ou sem permissão para editá-lo.');
 
             $localId = $this->obterOuCriarLocal($dados);
-            $stmt = $this->conexao->prepare("SELECT id_categoria FROM CATEGORIA WHERE id_categoria = :categoria AND ativo = 1");
-            $stmt->execute([':categoria' => $dados['categoria_id']]);
+            $stmt = $this->conexao->prepare("SELECT id_categoria FROM CATEGORIA WHERE id_categoria = :categoria AND (ativo = 1 OR id_categoria = :categoria_atual)");
+            $stmt->execute([
+                ':categoria' => $dados['categoria_id'],
+                ':categoria_atual' => $evento['categoria_id']
+            ]);
             if (!$stmt->fetchColumn()) throw new RuntimeException('Selecione uma categoria ativa.');
 
             $stmt = $this->conexao->prepare("UPDATE EVENTO SET categoria_id = :categoria, local_id = :local, titulo = :titulo,
