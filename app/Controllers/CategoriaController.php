@@ -26,6 +26,11 @@ class CategoriaController {
         return $this->categoriaDAO->buscarPorId($id);
     }
 
+    public function buscarCriadaPor(int $idCategoria, int $idUsuario): ?Categoria {
+        if ($idCategoria <= 0 || $idUsuario <= 0) return null;
+        return $this->categoriaDAO->buscarCriadaPor($idCategoria, $idUsuario);
+    }
+
     // CREATE - Cadastrar categoria
     public function cadastrar(string $nome, int $idUsuarioCriador): int {
 
@@ -61,26 +66,18 @@ class CategoriaController {
     }
 
     // UPDATE - Atualizar categoria
-    public function atualizar(
-        int $id,
-        string $nome,
-        bool $ativo
-    ): bool {
-
+    public function atualizar(int $id, string $nome, int $idUsuario): bool {
         $nome = trim($nome);
-
-        if (empty($nome)) {
-            throw new InvalidArgumentException(
-                "O nome da categoria é obrigatório."
-            );
+        if ($id <= 0 || $idUsuario <= 0) {
+            throw new InvalidArgumentException("Categoria ou usuário inválido.");
         }
-
-        $categoria = new Categoria($nome, $ativo);
-
-        return $this->categoriaDAO->atualizar(
-            $id,
-            $categoria
-        );
+        if ($nome === '') {
+            throw new InvalidArgumentException("O nome da categoria é obrigatório.");
+        }
+        if (mb_strlen($nome) > 50) {
+            throw new InvalidArgumentException("O nome da categoria deve ter no máximo 50 caracteres.");
+        }
+        return $this->categoriaDAO->atualizarCriadaPor($id, $nome, $idUsuario);
     }
 
 }

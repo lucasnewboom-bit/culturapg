@@ -5,6 +5,12 @@
 
     <h2>Categorias cadastradas</h2>
 
+    <?php if (!empty($mensagemCategorias)): ?>
+        <div class="mensagem-autenticacao" role="status">
+            <?= htmlspecialchars($mensagemCategorias, ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
+
     <a href="index.php?pagina=categorias&acao=cadastrar">
         Nova categoria
     </a>
@@ -32,9 +38,11 @@
                     </td>
 
                     <td>
-                        <a href="index.php?pagina=categorias&acao=editar&id=<?= $categoria->getIdCategoria() ?>">
-                            Editar
-                        </a>
+                        <?php if (isset($_SESSION['usuario']['id']) && $categoria->getAtivo() && $categoria->getCriadoPorUsuarioId() === (int) $_SESSION['usuario']['id']): ?>
+                            <a href="index.php?pagina=categorias&amp;acao=editar&amp;id=<?= (int) $categoria->getIdCategoria() ?>">Editar</a>
+                        <?php else: ?>
+                            <span>—</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
 

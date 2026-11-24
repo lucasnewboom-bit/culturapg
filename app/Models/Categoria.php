@@ -7,16 +7,19 @@ class Categoria {
     private ?int $idCategoria;
     private string $nome;
     private bool $ativo;
+    private ?int $criadoPorUsuarioId;
 
     // Construtor
     public function __construct(
         string $nome,
         bool $ativo = true,
-        ?int $idCategoria = null
+        ?int $idCategoria = null,
+        ?int $criadoPorUsuarioId = null
     ) {
         $this->idCategoria = $idCategoria;
         $this->nome = $nome;
         $this->ativo = $ativo;
+        $this->criadoPorUsuarioId = $criadoPorUsuarioId;
     }
 
     // Getters
@@ -30,6 +33,10 @@ class Categoria {
 
     public function getAtivo(): bool {
         return $this->ativo;
+    }
+
+    public function getCriadoPorUsuarioId(): ?int {
+        return $this->criadoPorUsuarioId;
     }
 
     // Setters

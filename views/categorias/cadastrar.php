@@ -70,6 +70,7 @@ $acaoFormularioCategoria = 'index.php?pagina=categorias&amp;acao=cadastrar'
                     <tr>
                         <td><?= $escaparCategoria($categoria->getNome()) ?></td>
                         <td>
+                            <a href="index.php?pagina=categorias&amp;acao=editar&amp;id=<?= (int) $categoria->getIdCategoria() ?>">Editar</a>
                             <form method="post" action="<?= $acaoFormularioCategoria ?>" onsubmit="return confirm('Remover esta categoria das opções de novos eventos? Eventos já cadastrados serão preservados.');">
                                 <input type="hidden" name="csrf_token" value="<?= $escaparCategoria($_SESSION['csrf_token'] ?? '') ?>">
                                 <input type="hidden" name="origem" value="<?= $escaparCategoria($origemCategoria) ?>">

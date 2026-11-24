@@ -44,7 +44,8 @@ class CategoriaDAO {
             $categorias[] = new Categoria(
                 $dados['nome'],
                 (bool) $dados['ativo'],
-                (int) $dados['id_categoria']
+                (int) $dados['id_categoria'],
+                isset($dados['criado_por_usuario_id']) ? (int) $dados['criado_por_usuario_id'] : null
             );
         }
 
@@ -54,7 +55,7 @@ class CategoriaDAO {
     // Lista somente as categorias ativas criadas pelo usuário autenticado.
     public function listarCriadasPor(int $idUsuario): array {
 
-        $sql = "SELECT nome, ativo, id_categoria
+        $sql = "SELECT nome, ativo, id_categoria, criado_por_usuario_id
                 FROM CATEGORIA
                 WHERE criado_por_usuario_id = :usuario
                   AND ativo = 1
@@ -68,11 +69,31 @@ class CategoriaDAO {
             $categorias[] = new Categoria(
                 $dados['nome'],
                 (bool) $dados['ativo'],
-                (int) $dados['id_categoria']
+                (int) $dados['id_categoria'],
+                (int) $dados['criado_por_usuario_id']
             );
         }
 
         return $categorias;
+    }
+
+    public function buscarCriadaPor(int $idCategoria, int $idUsuario): ?Categoria {
+        $sql = "SELECT id_categoria, nome, ativo, criado_por_usuario_id
+                FROM CATEGORIA
+                WHERE id_categoria = :categoria
+                  AND criado_por_usuario_id = :usuario
+                  AND ativo = 1
+                LIMIT 1";
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([':categoria' => $idCategoria, ':usuario' => $idUsuario]);
+        $dados = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$dados) return null;
+        return new Categoria(
+            $dados['nome'],
+            (bool) $dados['ativo'],
+            (int) $dados['id_categoria'],
+            (int) $dados['criado_por_usuario_id']
+        );
     }
 
     // A desativação mantém intactos os eventos que já usam a categoria.
@@ -114,27 +135,25 @@ class CategoriaDAO {
         return new Categoria(
             $dados['nome'],
             (bool) $dados['ativo'],
-            (int) $dados['id_categoria']
+            (int) $dados['id_categoria'],
+            isset($dados['criado_por_usuario_id']) ? (int) $dados['criado_por_usuario_id'] : null
         );
     }
 
     // UPDATE - Atualizar categoria
-    public function atualizar(
-        int $id,
-        Categoria $categoria
-    ): bool {
+    public function atualizarCriadaPor(int $idCategoria, string $nome, int $idUsuario): bool {
+        if (!$this->buscarCriadaPor($idCategoria, $idUsuario)) return false;
 
         $sql = "UPDATE CATEGORIA
-                SET nome = :nome,
-                    ativo = :ativo
-                WHERE id_categoria = :id";
-
+                SET nome = :nome
+                WHERE id_categoria = :categoria
+                  AND criado_por_usuario_id = :usuario
+                  AND ativo = 1";
         $stmt = $this->conexao->prepare($sql);
-
         return $stmt->execute([
-            ':nome' => $categoria->getNome(),
-            ':ativo' => $categoria->getAtivo(),
-            ':id' => $id
+            ':nome' => $nome,
+            ':categoria' => $idCategoria,
+            ':usuario' => $idUsuario
         ]);
     }
 

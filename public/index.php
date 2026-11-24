@@ -389,6 +389,8 @@ try {
             case 'listar':
 
                 $categorias = $categoriaController->listar();
+                $mensagemCategorias = $_SESSION['mensagem_categorias'] ?? '';
+                unset($_SESSION['mensagem_categorias']);
 
                 require_once __DIR__ . '/../views/categorias/listar.php';
 
@@ -471,6 +473,71 @@ try {
 
                 require_once __DIR__ . '/../views/layouts/header.php';
                 require_once __DIR__ . '/../views/categorias/cadastrar.php';
+                require_once __DIR__ . '/../views/layouts/footer.php';
+
+                break;
+
+            case 'editar':
+            case 'atualizar':
+
+                if (!isset($_SESSION['usuario']['id'])) {
+                    header('Location: index.php?pagina=login');
+                    exit;
+                }
+
+                $idCategoriaEditar = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+                if (!$idCategoriaEditar || $idCategoriaEditar <= 0) {
+                    http_response_code(400);
+                    echo 'Identificador de categoria inválido.';
+                    break;
+                }
+
+                $idUsuarioCategoria = (int) $_SESSION['usuario']['id'];
+                $categoria = $categoriaController->buscarCriadaPor((int) $idCategoriaEditar, $idUsuarioCategoria);
+                if (!$categoria) {
+                    http_response_code(404);
+                    echo 'Categoria não encontrada ou sem permissão para editá-la.';
+                    break;
+                }
+
+                $erroCategoria = '';
+                $nomeCategoria = $categoria->getNome();
+                if ($acao === 'atualizar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $tokenCategoria = (string) ($_POST['csrf_token'] ?? '');
+                    if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $tokenCategoria)) {
+                        $erroCategoria = 'A sessão expirou. Atualize a página e tente novamente.';
+                    } else {
+                        $nomeCategoria = trim((string) ($_POST['nome'] ?? ''));
+                        try {
+                            if (!$categoriaController->atualizar((int) $idCategoriaEditar, $nomeCategoria, $idUsuarioCategoria)) {
+                                http_response_code(404);
+                                throw new RuntimeException('Categoria não encontrada ou sem permissão para editá-la.');
+                            }
+                            $_SESSION['mensagem_categorias'] = 'Categoria atualizada com sucesso.';
+                            header('Location: index.php?pagina=categorias&acao=listar');
+                            exit;
+                        } catch (InvalidArgumentException $e) {
+                            $erroCategoria = $e->getMessage();
+                        } catch (PDOException $e) {
+                            if ($e->getCode() === '23000') {
+                                $erroCategoria = 'Já existe uma categoria com esse nome.';
+                            } else {
+                                error_log($e->getMessage());
+                                $erroCategoria = 'Não foi possível atualizar a categoria. Tente novamente.';
+                            }
+                        } catch (Throwable $e) {
+                            if ($e->getMessage() === 'Categoria não encontrada ou sem permissão para editá-la.') {
+                                $erroCategoria = $e->getMessage();
+                            } else {
+                                error_log($e->getMessage());
+                                $erroCategoria = 'Não foi possível atualizar a categoria. Tente novamente.';
+                            }
+                        }
+                    }
+                }
+
+                require_once __DIR__ . '/../views/layouts/header.php';
+                require_once __DIR__ . '/../views/categorias/editar.php';
                 require_once __DIR__ . '/../views/layouts/footer.php';
 
                 break;

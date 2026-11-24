@@ -55,7 +55,9 @@ CREATE TABLE `categoria` (
   `criado_por_usuario_id` int DEFAULT NULL,
   `ativo` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_categoria`),
-  UNIQUE KEY `nome` (`nome`)
+  UNIQUE KEY `nome` (`nome`),
+  KEY `idx_categoria_criado_por_usuario` (`criado_por_usuario_id`),
+  CONSTRAINT `fk_categoria_criador_usuario` FOREIGN KEY (`criado_por_usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `categoria` (`id_categoria`, `nome`, `ativo`) VALUES
